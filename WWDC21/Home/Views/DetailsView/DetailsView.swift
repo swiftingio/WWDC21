@@ -11,6 +11,7 @@ import SwiftUI
 struct DetailsView: View {
     @StateObject var viewModel: ApodViewModel
     @Binding var showDetails: Bool
+    var image: UIImage?
 
     var namespace: Namespace.ID
 
@@ -40,21 +41,24 @@ struct DetailsView: View {
             .padding(30)
         }
         .ignoresSafeArea()
+        .task {
+            try? await viewModel.getApodContent()
+        }
     }
 
     @ViewBuilder
     func makeImageView() -> some View {
         Group {
-            if let image = viewModel.image {
+            if let image = image {
                 Image(uiImage: image)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
-                    .frame(maxHeight: 400)
                     .clipped()
             } else {
                 ProgressView()
             }
         }
         .matchedGeometryEffect(id: "mainImage\(viewModel.title)", in: namespace)
+        .frame(maxWidth: .infinity, minHeight: 400, maxHeight: .infinity)
     }
 }

@@ -10,12 +10,12 @@ import SwiftUI
 
 struct ApodView: View {
     var namespace: Namespace.ID
-    @ObservedObject var viewModel: ApodViewModel
+    @StateObject var viewModel: ApodViewModel
     @Binding var showDetails: Bool
     @EnvironmentObject var presentedObject: PresentedView
 
     var isPresentedView: Bool {
-        showDetails && presentedObject.presentedViewModel == viewModel
+        showDetails && presentedObject.presentedViewModel?.url == viewModel.url
     }
 
     var body: some View {
@@ -35,6 +35,13 @@ struct ApodView: View {
                 .background(.thinMaterial)
             }
         }
+        .onTapGesture {
+            withAnimation {
+                presentedObject.image = viewModel.image
+                presentedObject.presentedViewModel = viewModel.apod
+                showDetails.toggle()
+            }
+        }
         .background(.thickMaterial)
         .mask(RoundedRectangle(cornerRadius: 16))
         .padding(.bottom, 8)
@@ -45,20 +52,23 @@ struct ApodView: View {
 
     @ViewBuilder
     func makeImageView() -> some View {
+        Text(viewModel.title)
+
+//        if !isPresentedView {
         Group {
             if let image = viewModel.image {
                 Image(uiImage: image)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
-                    .matchedGeometryEffect(id: "mainImage\(viewModel.title)", in: namespace)
             } else {
                 ProgressView()
             }
         }
+        .matchedGeometryEffect(id: "mainImage\(viewModel.title)", in: namespace)
         .frame(minWidth: 0, minHeight: 400)
+//        }
         HStack {
             Text(viewModel.title)
-                .matchedGeometryEffect(id: "mainTitle\(viewModel.title)", in: namespace)
             Spacer()
             Text(viewModel.date)
         }

@@ -13,7 +13,7 @@ import UIKit
         lhs.apod.url == rhs.apod.url
     }
 
-    private let apod: APODModel
+    let apod: APODModel
     private let networking: ApodNetworking
     private let imageCache: ImageCache
 
@@ -30,7 +30,7 @@ import UIKit
     }
 
     var date: String {
-        dateFormatter.string(from: apod.date)
+        apod.date
     }
 
     var url: String {

@@ -12,7 +12,7 @@ public struct APODModel: Codable, Equatable, Identifiable, Hashable {
         url
     }
 
-    public let date: Date
+    public let date: String
     public let explanation: String
     public let hdurl: String?
     public let media_type: APODMediaType
@@ -21,7 +21,7 @@ public struct APODModel: Codable, Equatable, Identifiable, Hashable {
     public let url: String
 
     public init(
-        date: Date,
+        date: String,
         explanation: String,
         hdurl: String?,
         media_type: APODMediaType,
@@ -39,7 +39,7 @@ public struct APODModel: Codable, Equatable, Identifiable, Hashable {
     }
 }
 
-extension APODModel {
+public extension APODModel {
     init(coreDataApod: APODYModel.Apod) {
         self.init(date: coreDataApod.date,
                   explanation: coreDataApod.explanation,

@@ -6,11 +6,13 @@
 //
 
 import APODY
+import APODYModel
 import CoreData
 import SwiftUI
 
 class PresentedView: ObservableObject {
-    @Published var presentedViewModel: ApodViewModel?
+    @Published var presentedViewModel: APODModel?
+    @Published var image: UIImage?
 }
 
 struct ContentView: View {
@@ -21,31 +23,60 @@ struct ContentView: View {
     @Namespace var namespace
     @State private var showDetails: Bool = false
 
+    @SectionedFetchRequest(
+        sectionIdentifier: \.date,
+        sortDescriptors: [SortDescriptor(\.title, order: .reverse)]
+    )
+    public var apods: SectionedFetchResults<String, Apod>
+
     var body: some View {
         ZStack {
             NavigationView {
                 ZStack {
-                    List(viewModel.objects, id: \.url) { apod in
-                        ApodView(namespace: namespace, viewModel: apod, showDetails: $showDetails)
-                            .listRowSeparator(.hidden)
+                    List {
+                        ForEach(apods) { section in
+                            Section(header: Text(section.id)) {
+                                ForEach(section) { apod in
+                                    ApodView(
+                                        namespace: namespace,
+                                        viewModel: ApodViewModel(apod: APODModel(coreDataApod: apod),
+                                                                 networking: viewModel.networking,
+                                                                 imageCache: viewModel.imageCache),
+                                        showDetails: $showDetails
+                                    )
+                                    .listRowBackground(Color.clear)
+                                    .listRowSeparator(.hidden)
+                                }
+                            }
+                        }
+                        .navigationTitle("APOD")
+                        .listStyle(.plain)
                     }
-                    .navigationTitle("APOD")
-                    .listStyle(.plain)
+                }
+                .refreshable {
+                    do {
+                        try await viewModel.refreshData()
+                    } catch {
+                        print("\(error.localizedDescription)")
+                    }
+                }
+                .task {
+                    do {
+                        try await viewModel.refreshData()
+                    } catch {
+                        print("\(error.localizedDescription)")
+                    }
                 }
             }
-            .refreshable {
-                do {
-                    try await viewModel.refreshData()
-                } catch {
-                    print("\(error.localizedDescription)")
-                }
-            }
-            .task {
-                do {
-                    try await viewModel.refreshData()
-                } catch {
-                    print("\(error.localizedDescription)")
-                }
+            if showDetails, let apod = presentedObject.presentedViewModel {
+                DetailsView(
+                    viewModel: ApodViewModel(apod: apod,
+                                             networking: viewModel.networking,
+                                             imageCache: viewModel.imageCache),
+                    showDetails: $showDetails,
+                    image: presentedObject.image,
+                    namespace: namespace
+                )
             }
         }
     }
