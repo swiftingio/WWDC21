@@ -9,7 +9,14 @@ import APODY
 import SwiftUI
 
 struct ApodView: View {
-    @StateObject var viewModel: ApodViewModel
+    var namespace: Namespace.ID
+    @ObservedObject var viewModel: ApodViewModel
+    @Binding var showDetails: Bool
+    @EnvironmentObject var presentedObject: PresentedView
+
+    var isPresentedView: Bool {
+        showDetails && presentedObject.presentedViewModel == viewModel
+    }
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -43,6 +50,7 @@ struct ApodView: View {
                 Image(uiImage: image)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
+                    .matchedGeometryEffect(id: "mainImage\(viewModel.title)", in: namespace)
             } else {
                 ProgressView()
             }
@@ -50,6 +58,7 @@ struct ApodView: View {
         .frame(minWidth: 0, minHeight: 400)
         HStack {
             Text(viewModel.title)
+                .matchedGeometryEffect(id: "mainTitle\(viewModel.title)", in: namespace)
             Spacer()
             Text(viewModel.date)
         }
@@ -59,9 +68,14 @@ struct ApodView: View {
 }
 
 struct ApodView_Previews: PreviewProvider {
+    @Namespace static var namespace
+
     static var previews: some View {
         let model = try? ApodyFixtures.example1().randomElement()
-        ApodView(viewModel: ApodViewModel(apod: model!, networking: DefaultApodNetworking(), imageCache: ImageCache()))
+        ApodView(namespace: namespace,
+                 viewModel: ApodViewModel(apod: model!,
+                                          networking: DefaultApodNetworking(),
+                                          imageCache: ImageCache()), showDetails: .constant(false))
             .environment(\.managedObjectContext, APODYPersistenceController.preview.container.viewContext)
     }
 }

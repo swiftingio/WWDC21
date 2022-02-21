@@ -9,37 +9,43 @@ import APODY
 import CoreData
 import SwiftUI
 
+class PresentedView: ObservableObject {
+    @Published var presentedViewModel: ApodViewModel?
+}
+
 struct ContentView: View {
     @ObservedObject var viewModel: HomeViewModel
     @Environment(\.managedObjectContext) private var viewContext
+    @EnvironmentObject var presentedObject: PresentedView
 
-    @State private var showingSheet: Bool = false
+    @Namespace var namespace
+    @State private var showDetails: Bool = false
 
     var body: some View {
-        NavigationView {
-            ZStack {
-                List {
-                    ForEach(viewModel.objects) { apod in
-                        ApodView(viewModel: apod)
+        ZStack {
+            NavigationView {
+                ZStack {
+                    List(viewModel.objects, id: \.url) { apod in
+                        ApodView(namespace: namespace, viewModel: apod, showDetails: $showDetails)
                             .listRowSeparator(.hidden)
                     }
+                    .navigationTitle("APOD")
+                    .listStyle(.plain)
                 }
-                .navigationTitle("APOD")
-                .listStyle(.plain)
             }
-        }
-        .refreshable {
-            do {
-                try await viewModel.refreshData()
-            } catch {
-                print("\(error.localizedDescription)")
+            .refreshable {
+                do {
+                    try await viewModel.refreshData()
+                } catch {
+                    print("\(error.localizedDescription)")
+                }
             }
-        }
-        .task {
-            do {
-                try await viewModel.refreshData()
-            } catch {
-                print("\(error.localizedDescription)")
+            .task {
+                do {
+                    try await viewModel.refreshData()
+                } catch {
+                    print("\(error.localizedDescription)")
+                }
             }
         }
     }

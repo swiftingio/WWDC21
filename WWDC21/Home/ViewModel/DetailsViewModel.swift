@@ -1,18 +1,14 @@
 //
-//  ApodViewModel.swift
+//  DetailsViewModel.swift
 //  WWDC21
 //
-//  Created by mazurkk3 on 18/02/2022.
+//  Created by mazurkk3 on 21/02/2022.
 //
 
 import APODY
 import UIKit
 
-@MainActor public class ApodViewModel: ObservableObject, Identifiable, Equatable {
-    public nonisolated static func == (lhs: ApodViewModel, rhs: ApodViewModel) -> Bool {
-        lhs.apod.url == rhs.apod.url
-    }
-
+@MainActor public class DetailsViewModel: ObservableObject, Identifiable {
     private let apod: APODModel
     private let networking: ApodNetworking
     private let imageCache: ImageCache
