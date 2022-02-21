@@ -39,7 +39,7 @@ enum ViewModelError: Error {
     public func refreshData() async throws {
         let currentDate = Date()
         let endDate = Calendar.current.date(byAdding: .month, value: -1, to: currentDate)!
-        
+
         let objects = try await networking.fetchApods(startDate: endDate, endDate: currentDate)
         try await persistence.save(apods: objects)
     }
@@ -48,7 +48,7 @@ enum ViewModelError: Error {
         guard let objects = dataSource.objects else {
             fatalError("Async stream have to be initialized prior")
         }
-        
+
         for await newObjects in objects {
             self.objects = newObjects.map { ApodViewModel(apod: $0, networking: networking, imageCache: imageCache) }
         }

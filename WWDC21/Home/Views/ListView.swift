@@ -17,10 +17,11 @@ struct ContentView: View {
     @State private var showingSheet: Bool = false
 
     @SectionedFetchRequest(
-        sectionIdentifier: \.date,
-        sortDescriptors: [SortDescriptor(\.title, order: .reverse)]
+        sectionIdentifier: ApodSort.default.section,
+        sortDescriptors: ApodSort.default.descriptors
     )
     public var apods: SectionedFetchResults<String, Apod>
+    @State private var selectedSort = ApodSort.default
 
     var body: some View {
         NavigationView {
@@ -29,7 +30,6 @@ struct ContentView: View {
                     ForEach(apods) { section in
                         Section(header: Text(section.id)) {
                             ForEach(section) { apod in
-                                Text(apod.title)
                                 ApodView(viewModel: ApodViewModel(apod: APODModel(coreDataApod: apod), networking: viewModel.networking, imageCache: viewModel.imageCache))
                                     .listRowSeparator(.hidden)
                             }
@@ -38,6 +38,19 @@ struct ContentView: View {
                 }
                 .navigationTitle("APOD")
                 .listStyle(.plain)
+                .toolbar {
+                    ToolbarItemGroup(placement: .navigationBarTrailing) {
+                        SortSelectionView(
+                            selectedSortItem: $selectedSort,
+                            sorts: ApodSort.sorts
+                        )
+                        .onChange(of: selectedSort) { _ in
+                            let request = apods
+                            request.sortDescriptors = selectedSort.descriptors
+                            request.sectionIdentifier = selectedSort.section
+                        }
+                    }
+                }
             }
         }
         .refreshable {

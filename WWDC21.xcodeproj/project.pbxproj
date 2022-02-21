@@ -19,6 +19,7 @@
 		0DC7AE4427BA375D003643FF /* WWDC21UITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DC7AE4327BA375D003643FF /* WWDC21UITestsLaunchTests.swift */; };
 		0DD03C1227BF841100347394 /* ApodViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD03C1127BF841100347394 /* ApodViewModel.swift */; };
 		0DD03C1427BFA07900347394 /* VideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD03C1327BFA07900347394 /* VideoView.swift */; };
+		1F1C55B027C437AE004AB73F /* SortSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F1C55AF27C437AE004AB73F /* SortSelectionView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +56,7 @@
 		0DC7AE4327BA375D003643FF /* WWDC21UITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WWDC21UITestsLaunchTests.swift; sourceTree = "<group>"; };
 		0DD03C1127BF841100347394 /* ApodViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApodViewModel.swift; sourceTree = "<group>"; };
 		0DD03C1327BFA07900347394 /* VideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoView.swift; sourceTree = "<group>"; };
+		1F1C55AF27C437AE004AB73F /* SortSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortSelectionView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,6 +105,7 @@
 			isa = PBXGroup;
 			children = (
 				0DC7AE2327BA375B003643FF /* ListView.swift */,
+				1F1C55AF27C437AE004AB73F /* SortSelectionView.swift */,
 				0DC6F6D327BE6A5A00E16145 /* ApodView.swift */,
 				0DD03C1327BFA07900347394 /* VideoView.swift */,
 			);
@@ -337,6 +340,7 @@
 				0DD03C1227BF841100347394 /* ApodViewModel.swift in Sources */,
 				0DC6F6D127BE4F1000E16145 /* HomeViewModel.swift in Sources */,
 				0DC7AE2227BA375B003643FF /* WWDC21App.swift in Sources */,
+				1F1C55B027C437AE004AB73F /* SortSelectionView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
