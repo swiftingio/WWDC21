@@ -26,7 +26,7 @@ import UIKit
     }
 
     var date: String {
-        return dateFormatter.string(from: apod.date)
+        return apod.date // dateFormatter.string(from: apod.date)
     }
 
     var url: String {

@@ -14,7 +14,7 @@ public extension Apod {
         return NSFetchRequest<Apod>(entityName: "Apod")
     }
 
-    @NSManaged var date: Date!
+    @NSManaged var date: String!
     @NSManaged var explanation: String!
     @NSManaged var hdurl: String?
     @NSManaged var media_type: String!

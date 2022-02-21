@@ -6,6 +6,7 @@
 //
 
 import APODY
+import APODYModel
 import CoreData
 import SwiftUI
 
@@ -15,13 +16,24 @@ struct ContentView: View {
 
     @State private var showingSheet: Bool = false
 
+    @SectionedFetchRequest(
+        sectionIdentifier: \.date,
+        sortDescriptors: [SortDescriptor(\.title, order: .reverse)]
+    )
+    public var apods: SectionedFetchResults<String, Apod>
+
     var body: some View {
         NavigationView {
             ZStack {
                 List {
-                    ForEach(viewModel.objects) { apod in
-                        ApodView(viewModel: apod)
-                            .listRowSeparator(.hidden)
+                    ForEach(apods) { section in
+                        Section(header: Text(section.id)) {
+                            ForEach(section) { apod in
+                                Text(apod.title)
+                                ApodView(viewModel: ApodViewModel(apod: APODModel(coreDataApod: apod), networking: viewModel.networking, imageCache: viewModel.imageCache))
+                                    .listRowSeparator(.hidden)
+                            }
+                        }
                     }
                 }
                 .navigationTitle("APOD")
