@@ -30,6 +30,16 @@ struct ContentView: View {
     public var apods: SectionedFetchResults<String, Apod>
     @State private var selectedSort = ApodSort.default
 
+    @State private var searchText: String = ""
+    var query: Binding<String> {
+        Binding {
+            searchText
+        } set: { newValue in
+            searchText = newValue
+            apods.nsPredicate = newValue.isEmpty ? nil : NSPredicate(format: "title CONTAINS %@", newValue)
+        }
+    }
+
     var body: some View {
         ZStack {
             NavigationView {
@@ -53,6 +63,7 @@ struct ContentView: View {
                         .navigationTitle("APOD")
                         .listStyle(.plain)
                     }
+                    .searchable(text: query)
                     .toolbar {
                         ToolbarItemGroup(placement: .navigationBarTrailing) {
                             SortSelectionView(
