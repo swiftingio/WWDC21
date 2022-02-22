@@ -41,68 +41,81 @@ struct ContentView: View {
     }
 
     var body: some View {
-        ZStack {
-            NavigationView {
-                ZStack {
-                    List {
-                        ForEach(apods) { section in
-                            Section(header: Text(section.id)) {
-                                ForEach(section) { apod in
-                                    ApodView(
-                                        namespace: namespace,
-                                        viewModel: ApodViewModel(apod: APODModel(coreDataApod: apod),
-                                                                 networking: viewModel.networking,
-                                                                 imageCache: viewModel.imageCache),
-                                        showDetails: $showDetails
-                                    )
-                                    .listRowBackground(Color.clear)
-                                    .listRowSeparator(.hidden)
+        TabView {
+            ZStack {
+                NavigationView {
+                    ZStack {
+                        List {
+                            ForEach(apods) { section in
+                                Section(header: Text(section.id)) {
+                                    ForEach(section) { apod in
+                                        ApodView(
+                                            namespace: namespace,
+                                            viewModel: ApodViewModel(apod: APODModel(coreDataApod: apod),
+                                                                     networking: viewModel.networking,
+                                                                     imageCache: viewModel.imageCache),
+                                            showDetails: $showDetails
+                                        )
+                                        .listRowBackground(Color.clear)
+                                        .listRowSeparator(.hidden)
+                                    }
+                                }
+                            }
+                            .navigationTitle("APOD")
+                            .listStyle(.plain)
+                        }
+                        .searchable(text: query)
+                        .toolbar {
+                            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                                SortSelectionView(
+                                    selectedSortItem: $selectedSort,
+                                    sorts: ApodSort.sorts
+                                )
+                                .onChange(of: selectedSort) { _ in
+                                    let request = apods
+                                    request.sortDescriptors = selectedSort.descriptors
+                                    request.sectionIdentifier = selectedSort.section
                                 }
                             }
                         }
-                        .navigationTitle("APOD")
-                        .listStyle(.plain)
                     }
-                    .searchable(text: query)
-                    .toolbar {
-                        ToolbarItemGroup(placement: .navigationBarTrailing) {
-                            SortSelectionView(
-                                selectedSortItem: $selectedSort,
-                                sorts: ApodSort.sorts
-                            )
-                            .onChange(of: selectedSort) { _ in
-                                let request = apods
-                                request.sortDescriptors = selectedSort.descriptors
-                                request.sectionIdentifier = selectedSort.section
-                            }
+                    .refreshable {
+                        do {
+                            try await viewModel.refreshData()
+                        } catch {
+                            print("\(error.localizedDescription)")
+                        }
+                    }
+                    .task {
+                        do {
+                            try await viewModel.refreshData()
+                        } catch {
+                            print("\(error.localizedDescription)")
                         }
                     }
                 }
-                .refreshable {
-                    do {
-                        try await viewModel.refreshData()
-                    } catch {
-                        print("\(error.localizedDescription)")
-                    }
-                }
-                .task {
-                    do {
-                        try await viewModel.refreshData()
-                    } catch {
-                        print("\(error.localizedDescription)")
-                    }
+                if showDetails, let apod = presentedObject.model {
+                    DetailsView(
+                        viewModel: ApodViewModel(apod: apod,
+                                                 networking: viewModel.networking,
+                                                 imageCache: viewModel.imageCache),
+                        showDetails: $showDetails,
+                        image: presentedObject.image,
+                        namespace: namespace
+                    )
                 }
             }
-            if showDetails, let apod = presentedObject.model {
-                DetailsView(
-                    viewModel: ApodViewModel(apod: apod,
-                                             networking: viewModel.networking,
-                                             imageCache: viewModel.imageCache),
-                    showDetails: $showDetails,
-                    image: presentedObject.image,
-                    namespace: namespace
-                )
+            .tabItem {
+                Image(systemName: "moon.stars.fill")
+                Text("Apod")
             }
+            .tag(1)
+            FormView()
+                .tabItem {
+                    Image(systemName: "gearshape.fill")
+                    Text("Settings")
+                }
+                .tag(2)
         }
     }
 }
