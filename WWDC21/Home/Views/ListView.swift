@@ -52,17 +52,17 @@ struct ContentView: View {
                         }
                         .navigationTitle("APOD")
                         .listStyle(.plain)
-                        .toolbar {
-                            ToolbarItemGroup(placement: .navigationBarTrailing) {
-                                SortSelectionView(
-                                    selectedSortItem: $selectedSort,
-                                    sorts: ApodSort.sorts
-                                )
-                                .onChange(of: selectedSort) { _ in
-                                    let request = apods
-                                    request.sortDescriptors = selectedSort.descriptors
-                                    request.sectionIdentifier = selectedSort.section
-                                }
+                    }
+                    .toolbar {
+                        ToolbarItemGroup(placement: .navigationBarTrailing) {
+                            SortSelectionView(
+                                selectedSortItem: $selectedSort,
+                                sorts: ApodSort.sorts
+                            )
+                            .onChange(of: selectedSort) { _ in
+                                let request = apods
+                                request.sortDescriptors = selectedSort.descriptors
+                                request.sectionIdentifier = selectedSort.section
                             }
                         }
                     }
