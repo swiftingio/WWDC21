@@ -22,6 +22,7 @@ public extension Apod {
         return NSFetchRequest<Apod>(entityName: "Apod")
     }
 
+    @NSManaged var favorite: NSNumber!
     @NSManaged var date: Date!
     @NSManaged var explanation: String!
     @NSManaged var hdurl: String?

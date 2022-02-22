@@ -8,14 +8,11 @@
 import APODY
 import UIKit
 
-@MainActor public class ApodViewModel: ObservableObject, Identifiable, Equatable {
-    public nonisolated static func == (lhs: ApodViewModel, rhs: ApodViewModel) -> Bool {
-        lhs.apod.url == rhs.apod.url
-    }
-
-    let apod: APODModel
+@MainActor public class ApodViewModel: ObservableObject, Identifiable {
+    private let apod: APODModel
     private let networking: ApodNetworking
     private let imageCache: ImageCache
+    private let persistence: ApodPersistence
 
     private var dateFormatter: DateFormatter {
         let dateFormatter = DateFormatter()
@@ -45,10 +42,19 @@ import UIKit
         apod.media_type
     }
 
-    init(apod: APODModel, networking: ApodNetworking, imageCache: ImageCache) {
+    var favorite: Bool {
+        apod.favorite
+    }
+
+    init(apod: APODModel, networking: ApodNetworking, imageCache: ImageCache, persistence: ApodPersistence) {
         self.apod = apod
         self.networking = networking
         self.imageCache = imageCache
+        self.persistence = persistence
+    }
+
+    public func toggleFavorite() async throws {
+        try await persistence.toggleFavorite(apod: apod)
     }
 
     public func getApodContent() async throws {

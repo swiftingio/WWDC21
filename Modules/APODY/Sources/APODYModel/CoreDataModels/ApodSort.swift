@@ -9,9 +9,9 @@ public struct ApodSort: Hashable, Identifiable {
     public static let sorts: [ApodSort] = [
         ApodSort(
             id: 0,
-            name: "Month | Ascending",
+            name: "Month | Descending",
             descriptors: [
-                SortDescriptor(\Apod.date, order: .forward),
+                SortDescriptor(\Apod.date, order: .reverse),
             ],
             section: \Apod.month
         ),

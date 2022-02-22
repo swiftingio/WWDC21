@@ -12,6 +12,17 @@ public struct APODModel: Codable, Equatable, Identifiable, Hashable {
         url
     }
 
+    enum CodingKeys: String, CodingKey {
+        case date
+        case explanation
+        case hdurl
+        case media_type
+        case service_version
+        case title
+        case url
+    }
+
+    public let favorite: Bool
     public let date: Date
     public let explanation: String
     public let hdurl: String?
@@ -20,6 +31,20 @@ public struct APODModel: Codable, Equatable, Identifiable, Hashable {
     public let title: String
     public let url: String
 
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        date = try container.decode(Date.self, forKey: CodingKeys.date)
+        explanation = try container.decode(String.self, forKey: CodingKeys.explanation)
+        hdurl = try container.decodeIfPresent(String.self, forKey: CodingKeys.hdurl)
+        media_type = try container.decode(APODMediaType.self, forKey: CodingKeys.media_type)
+        service_version = try container.decode(String.self, forKey: CodingKeys.service_version)
+        title = try container.decode(String.self, forKey: CodingKeys.title)
+        url = try container.decode(String.self, forKey: CodingKeys.url)
+        favorite = false
+    }
+
     public init(
         date: Date,
         explanation: String,
@@ -27,8 +52,10 @@ public struct APODModel: Codable, Equatable, Identifiable, Hashable {
         media_type: APODMediaType,
         service_version: String,
         title: String,
-        url: String
+        url: String,
+        favorite: Bool
     ) {
+        self.favorite = favorite
         self.date = date
         self.explanation = explanation
         self.hdurl = hdurl
@@ -47,7 +74,8 @@ public extension APODModel {
                   media_type: APODMediaType(rawValue: coreDataApod.media_type) ?? .image,
                   service_version: coreDataApod.service_version,
                   title: coreDataApod.title,
-                  url: coreDataApod.url)
+                  url: coreDataApod.url,
+                  favorite: coreDataApod.favorite.boolValue)
     }
 }
 
