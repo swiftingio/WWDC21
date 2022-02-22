@@ -9,7 +9,14 @@ import APODY
 import SwiftUI
 
 struct ApodView: View {
+    var namespace: Namespace.ID
     @StateObject var viewModel: ApodViewModel
+    @Binding var showDetails: Bool
+    @EnvironmentObject var presentedObject: PresentedView
+
+    var isPresentedView: Bool {
+        showDetails && presentedObject.model?.url == viewModel.url
+    }
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -19,13 +26,16 @@ struct ApodView: View {
             case .video:
                 VideoWebView(request: URLRequest(url: URL(string: viewModel.url)!))
                     .frame(maxWidth: .infinity, minHeight: 400)
-                HStack {
-                    Text(viewModel.title)
-                    Spacer()
-                    Text(viewModel.date)
+                makeTitleView()
+            }
+        }
+        .onTapGesture {
+            withAnimation {
+                if viewModel.type == .image {
+                    presentedObject.image = viewModel.image
+                    presentedObject.model = viewModel.apod
+                    showDetails.toggle()
                 }
-                .padding()
-                .background(.thinMaterial)
             }
         }
         .background(.thickMaterial)
@@ -47,11 +57,18 @@ struct ApodView: View {
                 ProgressView()
             }
         }
+        .matchedGeometryEffect(id: "mainImage\(viewModel.title)", in: namespace)
         .frame(minWidth: 0, minHeight: 400)
+
+        makeTitleView()
+    }
+
+    @ViewBuilder
+    func makeTitleView() -> some View {
         HStack {
             Text(viewModel.title)
+                .matchedGeometryEffect(id: "mainTitle\(viewModel.title)", in: namespace)
             Spacer()
-            Text(viewModel.date)
         }
         .padding()
         .background(.thinMaterial)
@@ -59,9 +76,14 @@ struct ApodView: View {
 }
 
 struct ApodView_Previews: PreviewProvider {
+    @Namespace static var namespace
+
     static var previews: some View {
         let model = try? ApodyFixtures.example1().randomElement()
-        ApodView(viewModel: ApodViewModel(apod: model!, networking: DefaultApodNetworking(), imageCache: ImageCache()))
+        ApodView(namespace: namespace,
+                 viewModel: ApodViewModel(apod: model!,
+                                          networking: DefaultApodNetworking(),
+                                          imageCache: ImageCache()), showDetails: .constant(false))
             .environment(\.managedObjectContext, APODYPersistenceController.preview.container.viewContext)
     }
 }

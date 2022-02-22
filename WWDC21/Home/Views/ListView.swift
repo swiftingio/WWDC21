@@ -10,11 +10,18 @@ import APODYModel
 import CoreData
 import SwiftUI
 
+class PresentedView: ObservableObject {
+    @Published var model: APODModel?
+    @Published var image: UIImage?
+}
+
 struct ContentView: View {
     @ObservedObject var viewModel: HomeViewModel
     @Environment(\.managedObjectContext) private var viewContext
+    @EnvironmentObject var presentedObject: PresentedView
 
-    @State private var showingSheet: Bool = false
+    @Namespace var namespace
+    @State private var showDetails: Bool = false
 
     @SectionedFetchRequest(
         sectionIdentifier: ApodSort.default.section,
@@ -24,47 +31,66 @@ struct ContentView: View {
     @State private var selectedSort = ApodSort.default
 
     var body: some View {
-        NavigationView {
-            ZStack {
-                List {
-                    ForEach(apods) { section in
-                        Section(header: Text(section.id)) {
-                            ForEach(section) { apod in
-                                ApodView(viewModel: ApodViewModel(apod: APODModel(coreDataApod: apod), networking: viewModel.networking, imageCache: viewModel.imageCache))
+        ZStack {
+            NavigationView {
+                ZStack {
+                    List {
+                        ForEach(apods) { section in
+                            Section(header: Text(section.id)) {
+                                ForEach(section) { apod in
+                                    ApodView(
+                                        namespace: namespace,
+                                        viewModel: ApodViewModel(apod: APODModel(coreDataApod: apod),
+                                                                 networking: viewModel.networking,
+                                                                 imageCache: viewModel.imageCache),
+                                        showDetails: $showDetails
+                                    )
+                                    .listRowBackground(Color.clear)
                                     .listRowSeparator(.hidden)
+                                }
+                            }
+                        }
+                        .navigationTitle("APOD")
+                        .listStyle(.plain)
+                        .toolbar {
+                            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                                SortSelectionView(
+                                    selectedSortItem: $selectedSort,
+                                    sorts: ApodSort.sorts
+                                )
+                                .onChange(of: selectedSort) { _ in
+                                    let request = apods
+                                    request.sortDescriptors = selectedSort.descriptors
+                                    request.sectionIdentifier = selectedSort.section
+                                }
                             }
                         }
                     }
                 }
-                .navigationTitle("APOD")
-                .listStyle(.plain)
-                .toolbar {
-                    ToolbarItemGroup(placement: .navigationBarTrailing) {
-                        SortSelectionView(
-                            selectedSortItem: $selectedSort,
-                            sorts: ApodSort.sorts
-                        )
-                        .onChange(of: selectedSort) { _ in
-                            let request = apods
-                            request.sortDescriptors = selectedSort.descriptors
-                            request.sectionIdentifier = selectedSort.section
-                        }
+                .refreshable {
+                    do {
+                        try await viewModel.refreshData()
+                    } catch {
+                        print("\(error.localizedDescription)")
+                    }
+                }
+                .task {
+                    do {
+                        try await viewModel.refreshData()
+                    } catch {
+                        print("\(error.localizedDescription)")
                     }
                 }
             }
-        }
-        .refreshable {
-            do {
-                try await viewModel.refreshData()
-            } catch {
-                print("\(error.localizedDescription)")
-            }
-        }
-        .task {
-            do {
-                try await viewModel.refreshData()
-            } catch {
-                print("\(error.localizedDescription)")
+            if showDetails, let apod = presentedObject.model {
+                DetailsView(
+                    viewModel: ApodViewModel(apod: apod,
+                                             networking: viewModel.networking,
+                                             imageCache: viewModel.imageCache),
+                    showDetails: $showDetails,
+                    image: presentedObject.image,
+                    namespace: namespace
+                )
             }
         }
     }

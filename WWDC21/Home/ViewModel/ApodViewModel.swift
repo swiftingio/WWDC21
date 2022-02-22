@@ -8,12 +8,14 @@
 import APODY
 import UIKit
 
-@MainActor public class ApodViewModel: ObservableObject, Identifiable {
-    private let apod: APODModel
+@MainActor public class ApodViewModel: ObservableObject, Identifiable, Equatable {
+    public nonisolated static func == (lhs: ApodViewModel, rhs: ApodViewModel) -> Bool {
+        lhs.apod.url == rhs.apod.url
+    }
+
+    let apod: APODModel
     private let networking: ApodNetworking
     private let imageCache: ImageCache
-
-    @Published var image: UIImage?
 
     private var dateFormatter: DateFormatter {
         let dateFormatter = DateFormatter()
@@ -21,20 +23,26 @@ import UIKit
         return dateFormatter
     }
 
+    @Published var image: UIImage?
+
     var title: String {
-        return apod.title
+        apod.title
     }
 
     var date: String {
-        return dateFormatter.string(from: apod.date)
+        dateFormatter.string(from: apod.date)
     }
 
     var url: String {
-        return apod.url
+        apod.url
+    }
+
+    var description: String {
+        apod.explanation
     }
 
     var type: APODMediaType {
-        return apod.media_type
+        apod.media_type
     }
 
     init(apod: APODModel, networking: ApodNetworking, imageCache: ImageCache) {
@@ -58,7 +66,6 @@ import UIKit
             let image = try await networking.fetchImage(url: apod.url)
             self.image = image
             let url = apod.url
-
             cacheImage(image: image, url: url)
         }
     }
