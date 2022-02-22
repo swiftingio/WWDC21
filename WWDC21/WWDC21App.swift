@@ -6,37 +6,28 @@
 //
 
 import APODY
+import CoreData
 import SwiftUI
 
 @main
 struct WWDC21App: App {
     let persistenceController = APODYPersistenceController.shared
+    let context: NSManagedObjectContext = {
+        APODYPersistenceController.shared.container.viewContext
+    }()
+
     let presentedObject = PresentedView()
 
     var body: some Scene {
         WindowGroup {
-            TabView {
-                ContentView(viewModel: HomeViewModel(
-                    persistence: DefaultApodStorage(
-                        container: persistenceController.container
-                    ),
-                    dataSource: DefaultApodPersistenceDataSource(
-                        context: persistenceController.container.newBackgroundContext())
-                ))
-                .tabItem {
-                    Image(systemName: "globe.europe.africa")
-                    Text("Browse")
-                }
-
-                FavoritesView()
-                    .tabItem {
-                        Image(systemName: "star")
-                        Text("Favorites")
-                    }
-            }
-            .colorScheme(.dark)
-            .font(.headline)
-            .environment(\.managedObjectContext, persistenceController.container.viewContext)
+            ApodyTabView(viewModel: HomeViewModel(
+                persistence: DefaultApodStorage(
+                    container: persistenceController.container
+                ),
+                dataSource: DefaultApodPersistenceDataSource(
+                    context: persistenceController.container.newBackgroundContext())
+            ))
+            .environment(\.managedObjectContext, context)
             .environmentObject(presentedObject)
         }
     }

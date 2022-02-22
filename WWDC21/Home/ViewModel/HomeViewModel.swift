@@ -50,7 +50,7 @@ enum ViewModelError: Error {
         }
 
         for await newObjects in objects {
-            self.objects = newObjects.map { ApodViewModel(apod: $0, networking: networking, imageCache: imageCache) }
+            self.objects = newObjects.map { ApodViewModel(apod: $0, networking: networking, imageCache: imageCache, persistence: persistence) }
         }
     }
 }
