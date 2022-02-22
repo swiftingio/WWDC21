@@ -15,9 +15,29 @@ struct WWDC21App: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView(viewModel: HomeViewModel(persistence: DefaultApodStorage(container: persistenceController.container), dataSource: DefaultApodPersistenceDataSource(context: persistenceController.container.newBackgroundContext())))
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
-                .environmentObject(presentedObject)
+            TabView {
+                ContentView(viewModel: HomeViewModel(
+                    persistence: DefaultApodStorage(
+                        container: persistenceController.container
+                    ),
+                    dataSource: DefaultApodPersistenceDataSource(
+                        context: persistenceController.container.newBackgroundContext())
+                ))
+                .tabItem {
+                    Image(systemName: "globe.europe.africa")
+                    Text("Browse")
+                }
+
+                FavoritesView()
+                    .tabItem {
+                        Image(systemName: "star")
+                        Text("Favorites")
+                    }
+            }
+            .colorScheme(.dark)
+            .font(.headline)
+            .environment(\.managedObjectContext, persistenceController.container.viewContext)
+            .environmentObject(presentedObject)
         }
     }
 }
