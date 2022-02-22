@@ -93,6 +93,8 @@ struct ContentView: View {
                     }
                 }
             }
+            .colorScheme(.dark)
+
             if showDetails, let apod = presentedObject.model {
                 DetailsView(
                     viewModel: ApodViewModel(apod: apod,

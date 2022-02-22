@@ -17,7 +17,7 @@ struct DetailsView: View {
 
     var body: some View {
         ZStack {
-            Color(.white)
+            BackgroundTimelineView(stars: BackgroundTimelineView.generateStars)
             ScrollView {
                 VStack {
                     makeImageView()
@@ -40,6 +40,7 @@ struct DetailsView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
             .padding(30)
         }
+        .colorScheme(.dark)
         .ignoresSafeArea()
         .task {
             try? await viewModel.getApodContent()
