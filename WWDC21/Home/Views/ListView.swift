@@ -105,11 +105,23 @@ struct ContentView: View {
                     )
                 }
             }
+            .colorScheme(.dark)
             .tabItem {
                 Image(systemName: "moon.stars.fill")
                 Text("Apod")
+                    .tag(1)
             }
-            .tag(1)
+
+            if showDetails, let apod = presentedObject.model {
+                DetailsView(
+                    viewModel: ApodViewModel(apod: apod,
+                                             networking: viewModel.networking,
+                                             imageCache: viewModel.imageCache),
+                    showDetails: $showDetails,
+                    image: presentedObject.image,
+                    namespace: namespace
+                )
+            }
             FormView()
                 .tabItem {
                     Image(systemName: "gearshape.fill")

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0D3DE93D27C4CB7F005EBEF1 /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D3DE93C27C4CB7F005EBEF1 /* TimelineView.swift */; };
 		0DC0CBCD27C37370002576D4 /* DetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DC0CBCC27C37370002576D4 /* DetailsView.swift */; };
 		0DC6F6CE27BE4CF900E16145 /* APODY in Frameworks */ = {isa = PBXBuildFile; productRef = 0DC6F6CD27BE4CF900E16145 /* APODY */; };
 		0DC6F6D127BE4F1000E16145 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DC6F6D027BE4F1000E16145 /* HomeViewModel.swift */; };
@@ -42,6 +43,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0D3DE93C27C4CB7F005EBEF1 /* TimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineView.swift; sourceTree = "<group>"; };
 		0DC0CBCC27C37370002576D4 /* DetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailsView.swift; sourceTree = "<group>"; };
 		0DC6F6C927BE440800E16145 /* APODY */ = {isa = PBXFileReference; lastKnownFileType = folder; name = APODY; path = Modules/APODY; sourceTree = "<group>"; };
 		0DC6F6D027BE4F1000E16145 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
@@ -118,6 +120,7 @@
 			children = (
 				0DC0CBCB27C37358002576D4 /* DetailsView */,
 				0DC7AE2327BA375B003643FF /* ListView.swift */,
+				0D3DE93C27C4CB7F005EBEF1 /* TimelineView.swift */,
 				1F1C55AF27C437AE004AB73F /* SortSelectionView.swift */,
 				0DC6F6D327BE6A5A00E16145 /* ApodView.swift */,
 				0DD03C1327BFA07900347394 /* VideoView.swift */,
@@ -356,6 +359,7 @@
 				0DC6F6D127BE4F1000E16145 /* HomeViewModel.swift in Sources */,
 				1F1C55B227C503F8004AB73F /* FormView.swift in Sources */,
 				0DC7AE2227BA375B003643FF /* WWDC21App.swift in Sources */,
+				0D3DE93D27C4CB7F005EBEF1 /* TimelineView.swift in Sources */,
 				1F1C55B027C437AE004AB73F /* SortSelectionView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
