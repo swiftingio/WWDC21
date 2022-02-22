@@ -24,10 +24,11 @@ struct ContentView: View {
     @State private var showDetails: Bool = false
 
     @SectionedFetchRequest(
-        sectionIdentifier: \.date,
-        sortDescriptors: [SortDescriptor(\.title, order: .reverse)]
+        sectionIdentifier: ApodSort.default.section,
+        sortDescriptors: ApodSort.default.descriptors
     )
     public var apods: SectionedFetchResults<String, Apod>
+    @State private var selectedSort = ApodSort.default
 
     var body: some View {
         ZStack {
@@ -51,6 +52,19 @@ struct ContentView: View {
                         }
                         .navigationTitle("APOD")
                         .listStyle(.plain)
+                        .toolbar {
+                            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                                SortSelectionView(
+                                    selectedSortItem: $selectedSort,
+                                    sorts: ApodSort.sorts
+                                )
+                                .onChange(of: selectedSort) { _ in
+                                    let request = apods
+                                    request.sortDescriptors = selectedSort.descriptors
+                                    request.sectionIdentifier = selectedSort.section
+                                }
+                            }
+                        }
                     }
                 }
                 .refreshable {

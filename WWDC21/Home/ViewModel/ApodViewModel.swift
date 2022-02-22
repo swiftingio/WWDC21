@@ -17,6 +17,12 @@ import UIKit
     private let networking: ApodNetworking
     private let imageCache: ImageCache
 
+    private var dateFormatter: DateFormatter {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "YY/MM/dd"
+        return dateFormatter
+    }
+
     @Published var image: UIImage?
 
     var title: String {
@@ -24,7 +30,7 @@ import UIKit
     }
 
     var date: String {
-        apod.date
+        dateFormatter.string(from: apod.date)
     }
 
     var url: String {
