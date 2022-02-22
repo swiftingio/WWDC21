@@ -11,7 +11,7 @@ import CoreData
 import SwiftUI
 
 class PresentedView: ObservableObject {
-    @Published var presentedViewModel: APODModel?
+    @Published var model: APODModel?
     @Published var image: UIImage?
 }
 
@@ -68,7 +68,7 @@ struct ContentView: View {
                     }
                 }
             }
-            if showDetails, let apod = presentedObject.presentedViewModel {
+            if showDetails, let apod = presentedObject.model {
                 DetailsView(
                     viewModel: ApodViewModel(apod: apod,
                                              networking: viewModel.networking,

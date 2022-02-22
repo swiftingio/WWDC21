@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		0DC0CBCD27C37370002576D4 /* DetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DC0CBCC27C37370002576D4 /* DetailsView.swift */; };
-		0DC0CBD127C37BBA002576D4 /* DetailsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DC0CBD027C37BBA002576D4 /* DetailsViewModel.swift */; };
 		0DC6F6CE27BE4CF900E16145 /* APODY in Frameworks */ = {isa = PBXBuildFile; productRef = 0DC6F6CD27BE4CF900E16145 /* APODY */; };
 		0DC6F6D127BE4F1000E16145 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DC6F6D027BE4F1000E16145 /* HomeViewModel.swift */; };
 		0DC6F6D427BE6A5B00E16145 /* ApodView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DC6F6D327BE6A5A00E16145 /* ApodView.swift */; };
@@ -42,7 +41,6 @@
 
 /* Begin PBXFileReference section */
 		0DC0CBCC27C37370002576D4 /* DetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailsView.swift; sourceTree = "<group>"; };
-		0DC0CBD027C37BBA002576D4 /* DetailsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailsViewModel.swift; sourceTree = "<group>"; };
 		0DC6F6C927BE440800E16145 /* APODY */ = {isa = PBXFileReference; lastKnownFileType = folder; name = APODY; path = Modules/APODY; sourceTree = "<group>"; };
 		0DC6F6D027BE4F1000E16145 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
 		0DC6F6D227BE5AF600E16145 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -186,7 +184,6 @@
 			children = (
 				0DC6F6D027BE4F1000E16145 /* HomeViewModel.swift */,
 				0DD03C1127BF841100347394 /* ApodViewModel.swift */,
-				0DC0CBD027C37BBA002576D4 /* DetailsViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -352,7 +349,6 @@
 				0DD03C1227BF841100347394 /* ApodViewModel.swift in Sources */,
 				0DC6F6D127BE4F1000E16145 /* HomeViewModel.swift in Sources */,
 				0DC7AE2227BA375B003643FF /* WWDC21App.swift in Sources */,
-				0DC0CBD127C37BBA002576D4 /* DetailsViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

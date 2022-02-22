@@ -27,7 +27,7 @@ struct DetailsView: View {
                 }
             }
             Button {
-                withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
+                withAnimation {
                     showDetails.toggle()
                 }
             } label: {

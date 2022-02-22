@@ -19,12 +19,6 @@ import UIKit
 
     @Published var image: UIImage?
 
-    private var dateFormatter: DateFormatter {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "YY/MM/dd"
-        return dateFormatter
-    }
-
     var title: String {
         apod.title
     }
@@ -66,7 +60,6 @@ import UIKit
             let image = try await networking.fetchImage(url: apod.url)
             self.image = image
             let url = apod.url
-
             cacheImage(image: image, url: url)
         }
     }

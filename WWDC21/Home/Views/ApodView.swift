@@ -15,7 +15,7 @@ struct ApodView: View {
     @EnvironmentObject var presentedObject: PresentedView
 
     var isPresentedView: Bool {
-        showDetails && presentedObject.presentedViewModel?.url == viewModel.url
+        showDetails && presentedObject.model?.url == viewModel.url
     }
 
     var body: some View {
@@ -26,20 +26,16 @@ struct ApodView: View {
             case .video:
                 VideoWebView(request: URLRequest(url: URL(string: viewModel.url)!))
                     .frame(maxWidth: .infinity, minHeight: 400)
-                HStack {
-                    Text(viewModel.title)
-                    Spacer()
-                    Text(viewModel.date)
-                }
-                .padding()
-                .background(.thinMaterial)
+                makeTitleView()
             }
         }
         .onTapGesture {
             withAnimation {
-                presentedObject.image = viewModel.image
-                presentedObject.presentedViewModel = viewModel.apod
-                showDetails.toggle()
+                if viewModel.type == .image {
+                    presentedObject.image = viewModel.image
+                    presentedObject.model = viewModel.apod
+                    showDetails.toggle()
+                }
             }
         }
         .background(.thickMaterial)
@@ -52,9 +48,6 @@ struct ApodView: View {
 
     @ViewBuilder
     func makeImageView() -> some View {
-        Text(viewModel.title)
-
-//        if !isPresentedView {
         Group {
             if let image = viewModel.image {
                 Image(uiImage: image)
@@ -66,11 +59,16 @@ struct ApodView: View {
         }
         .matchedGeometryEffect(id: "mainImage\(viewModel.title)", in: namespace)
         .frame(minWidth: 0, minHeight: 400)
-//        }
+
+        makeTitleView()
+    }
+
+    @ViewBuilder
+    func makeTitleView() -> some View {
         HStack {
             Text(viewModel.title)
+                .matchedGeometryEffect(id: "mainTitle\(viewModel.title)", in: namespace)
             Spacer()
-            Text(viewModel.date)
         }
         .padding()
         .background(.thinMaterial)
