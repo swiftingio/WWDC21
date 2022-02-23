@@ -15,10 +15,6 @@ struct ApodView: View {
     @Binding var showDetails: Bool
     @EnvironmentObject var presentedObject: PresentedView
 
-    var isPresentedView: Bool {
-        showDetails && presentedObject.model?.url == viewModel.url
-    }
-
     var body: some View {
         ZStack(alignment: .bottom) {
             switch viewModel.type {
@@ -70,20 +66,14 @@ struct ApodView: View {
             Text(viewModel.title)
                 .matchedGeometryEffect(id: "mainTitle\(viewModel.title)", in: namespace)
             Spacer()
-            if model.favorite {
-                Button {
-                    Task {
-                        try? await viewModel.toggleFavorite()
-                    }
-                } label: {
-                    Image(systemName: "star.fill")
+            Button {
+                Task {
+                    try? await viewModel.toggleFavorite()
                 }
-            } else {
-                Button {
-                    Task {
-                        try? await viewModel.toggleFavorite()
-                    }
-                } label: {
+            } label: {
+                if model.favorite {
+                    Image(systemName: "star.fill")
+                } else {
                     Image(systemName: "star")
                 }
             }

@@ -9,10 +9,6 @@ import APODY
 import Foundation
 import UIKit
 
-enum ViewModelError: Error {
-    case deinitialized
-}
-
 @MainActor class HomeViewModel: ObservableObject {
     @Published var objects: [ApodViewModel] = []
 
@@ -45,12 +41,8 @@ enum ViewModelError: Error {
     }
 
     public func setupDataSource() async {
-        guard let objects = dataSource.objects else {
-            fatalError("Async stream have to be initialized prior")
-        }
-
-        for await newObjects in objects {
-            self.objects = newObjects.map { ApodViewModel(apod: $0, networking: networking, imageCache: imageCache, persistence: persistence) }
+        for await newObjects in dataSource.getObjects() {
+            objects = newObjects.map { ApodViewModel(apod: $0, networking: networking, imageCache: imageCache, persistence: persistence) }
         }
     }
 }
