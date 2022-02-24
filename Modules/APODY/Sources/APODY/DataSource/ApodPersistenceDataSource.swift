@@ -10,16 +10,20 @@ import Combine
 import CoreData
 import Foundation
 
-public typealias ApodDataSubject = CurrentValueSubject<[APODModel], Never>
-
 public protocol ContinousApodPersistenceDataSource {
-    func getObjects() -> AsyncStream<[APODModel]>
+    func getObjects() -> AsyncStream<[ApodModel]>
 }
 
 public class DefaultApodPersistenceDataSource: NSObject, ContinousApodPersistenceDataSource {
-    private var newDataAppeared: (([APODModel]) -> Void)?
+    private var newDataAppeared: (([ApodModel]) -> Void)?
     private let context: NSManagedObjectContext
     private var fetchedResultController: NSFetchedResultsController<Apod>?
+
+    private var currentData: [ApodModel] {
+        let fetchedData = fetchedResultController?.fetchedObjects ?? []
+        let mappedData = fetchedData.compactMap { ApodModel(coreDataApod: $0) }
+        return mappedData
+    }
 
     public init(context: NSManagedObjectContext) {
         self.context = context
@@ -28,8 +32,8 @@ public class DefaultApodPersistenceDataSource: NSObject, ContinousApodPersistenc
         setupSubscription()
     }
 
-    public func getObjects() -> AsyncStream<[APODModel]> {
-        return AsyncStream<[APODModel]> { [weak self] continuation in
+    public func getObjects() -> AsyncStream<[ApodModel]> {
+        return AsyncStream<[ApodModel]> { [weak self] continuation in
             guard let self = self else {
                 continuation.finish()
                 return
@@ -42,18 +46,14 @@ public class DefaultApodPersistenceDataSource: NSObject, ContinousApodPersistenc
         }
     }
 
-    private var currentData: [APODModel] {
-        let fetchedData = fetchedResultController?.fetchedObjects ?? []
-        let mappedData = fetchedData.compactMap { APODModel(coreDataApod: $0) }
-        return mappedData
-    }
-
     public func setupSubscription() {
         context.automaticallyMergesChangesFromParent = true
         context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+
         let fetchRequest = Apod.fetchRequest()
-        fetchRequest
-            .sortDescriptors = [NSSortDescriptor(keyPath: \Apod.date, ascending: false)]
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(keyPath: \Apod.date, ascending: false),
+        ]
         fetchRequest.returnsObjectsAsFaults = false
         let fetchController = NSFetchedResultsController(
             fetchRequest: fetchRequest,
@@ -62,6 +62,7 @@ public class DefaultApodPersistenceDataSource: NSObject, ContinousApodPersistenc
             cacheName: nil
         )
         fetchController.delegate = self
+
         fetchedResultController = fetchController
 
         do {
@@ -71,6 +72,8 @@ public class DefaultApodPersistenceDataSource: NSObject, ContinousApodPersistenc
         }
     }
 }
+
+// MARK: Delegate methods
 
 extension DefaultApodPersistenceDataSource: NSFetchedResultsControllerDelegate {
     public func controllerDidChangeContent(_: NSFetchedResultsController<NSFetchRequestResult>) {

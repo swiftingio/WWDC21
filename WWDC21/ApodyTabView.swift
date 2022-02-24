@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 struct ApodyTabView: View {
-    let viewModel: HomeViewModel
+    let viewModel: ApodViewModel
 
     var body: some View {
         TabView {

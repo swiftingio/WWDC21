@@ -10,7 +10,7 @@ import Foundation
 import SwiftUI
 
 struct DetailsView: View {
-    let model: APODModel
+    let model: ApodModel
     @Binding var showDetails: Bool
     @Binding var presentedImage: UIImage?
 

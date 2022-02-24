@@ -5,8 +5,8 @@ import Foundation
 public protocol ApodPersistence {
     var container: NSPersistentContainer { get set }
 
-    func save(apods: [APODModel]) async throws
-    func toggleFavorite(apod: APODModel) async throws
+    func save(apods: [ApodModel]) async throws
+    func toggleFavorite(apod: ApodModel) async throws
     func purge() async throws
 }
 
@@ -21,10 +21,11 @@ public class DefaultApodStorage: ApodPersistence {
         self.container = container
     }
 
-    public func save(apods: [APODModel]) async throws {
+    public func save(apods: [ApodModel]) async throws {
         let context = container.newBackgroundContext()
         context.automaticallyMergesChangesFromParent = true
         context.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy
+
         try await context.perform {
             apods.forEach { apod in
                 _ = Apod(model: apod, context: context)
@@ -42,10 +43,11 @@ public class DefaultApodStorage: ApodPersistence {
         }
     }
 
-    public func toggleFavorite(apod: APODModel) async throws {
+    public func toggleFavorite(apod: ApodModel) async throws {
         let context = container.newBackgroundContext()
         context.automaticallyMergesChangesFromParent = true
         context.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy
+
         try await context.perform {
             let request: NSFetchRequest<Apod> = Apod.fetchRequest()
             request.fetchLimit = 1

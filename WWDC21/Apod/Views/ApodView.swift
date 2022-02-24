@@ -10,12 +10,12 @@ import SwiftUI
 
 struct ApodView: View {
     var namespace: Namespace.ID
-    let model: APODModel
+    let model: ApodModel
     let image: UIImage?
     let persistence: ApodPersistence
 
     @Binding var showDetails: Bool
-    @Binding var presentedModel: APODModel?
+    @Binding var presentedModel: ApodModel?
     @Binding var presentedImage: UIImage?
 
     var body: some View {

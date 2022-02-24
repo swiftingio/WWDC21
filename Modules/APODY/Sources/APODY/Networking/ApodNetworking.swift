@@ -9,8 +9,8 @@ import Foundation
 import UIKit
 
 public protocol ApodNetworking {
-    func fetchApods(count: Int) async throws -> [APODModel]
-    func fetchApods(startDate: Date, endDate: Date) async throws -> [APODModel]
+    func fetchApods(count: Int) async throws -> [ApodModel]
+    func fetchApods(startDate: Date, endDate: Date) async throws -> [ApodModel]
 
     func fetchImage(url: String) async throws -> UIImage
 }
@@ -37,7 +37,7 @@ public class DefaultApodNetworking: ApodNetworking {
         self.init(urlBuilder: defaultBuilder, jsonDecoder: defaultJsonDecoder)
     }
 
-    public func fetchApods(count: Int) async throws -> [APODModel] {
+    public func fetchApods(count: Int) async throws -> [ApodModel] {
         let endpoint = ApodEndpoint.apody
 
         let parameters = [
@@ -51,11 +51,11 @@ public class DefaultApodNetworking: ApodNetworking {
             throw ApodNetworkingError.invalidServerResponse
         }
 
-        let parsedData = try decoder.decode([APODModel].self, from: data)
+        let parsedData = try decoder.decode([ApodModel].self, from: data)
         return parsedData
     }
 
-    public func fetchApods(startDate: Date, endDate: Date) async throws -> [APODModel] {
+    public func fetchApods(startDate: Date, endDate: Date) async throws -> [ApodModel] {
         let endpoint = ApodEndpoint.apody
         let parameters = [
             ApodParameter.startDate(startDate),
@@ -70,7 +70,7 @@ public class DefaultApodNetworking: ApodNetworking {
             throw ApodNetworkingError.invalidServerResponse
         }
 
-        let parsedData = try decoder.decode([APODModel].self, from: data)
+        let parsedData = try decoder.decode([ApodModel].self, from: data)
 
         return parsedData
     }

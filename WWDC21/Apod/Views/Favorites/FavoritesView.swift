@@ -12,12 +12,10 @@ import Foundation
 import SwiftUI
 
 struct FavoritesView: View {
-    @ObservedObject var viewModel: HomeViewModel
-
     @Namespace var favoritesNamespace
-    @State private var showDetails: Bool = false
-    @State private var presentedModel: APODModel?
-    @State private var presentedImage: UIImage?
+    @ObservedObject var viewModel: ApodViewModel
+
+    // MARK: Core data properties
 
     @FetchRequest(
         entity: Apod.entity(),
@@ -26,6 +24,14 @@ struct FavoritesView: View {
         ],
         predicate: NSPredicate(format: "favorite == %@", NSNumber(value: true))
     ) var apods: FetchedResults<Apod>
+
+    // MARK: Details View properties
+
+    @State private var showDetails: Bool = false
+    @State private var presentedModel: ApodModel?
+    @State private var presentedImage: UIImage?
+
+    // MARK: Views
 
     var body: some View {
         ZStack {
@@ -36,7 +42,7 @@ struct FavoritesView: View {
                     } else {
                         List {
                             ForEach(apods) { apod in
-                                let model = APODModel(coreDataApod: apod)
+                                let model = ApodModel(coreDataApod: apod)
 
                                 ApodView(
                                     namespace: favoritesNamespace,
@@ -69,4 +75,7 @@ struct FavoritesView: View {
             }
         }
     }
+
+    @ViewBuilder
+    private func makeApodCell() -> some View {}
 }

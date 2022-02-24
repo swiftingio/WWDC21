@@ -19,12 +19,11 @@ public struct ApodSort: Hashable, Identifiable {
             id: 1,
             name: "Week | Ascending",
             descriptors: [
-                SortDescriptor(\Apod.date, order: .reverse),
+                SortDescriptor(\Apod.date, order: .forward),
             ],
             section: \Apod.week
         ),
     ]
 
-    // 4
     public static var `default`: ApodSort { sorts[0] }
 }

@@ -16,11 +16,9 @@ struct WWDC21App: App {
         APODYPersistenceController.shared.container.viewContext
     }()
 
-    let presentedObject = PresentedView()
-
     var body: some Scene {
         WindowGroup {
-            ApodyTabView(viewModel: HomeViewModel(
+            ApodyTabView(viewModel: ApodViewModel(
                 persistence: DefaultApodStorage(
                     container: persistenceController.container
                 ),
@@ -28,7 +26,6 @@ struct WWDC21App: App {
                     context: persistenceController.container.newBackgroundContext())
             ))
             .environment(\.managedObjectContext, context)
-            .environmentObject(presentedObject)
         }
     }
 }

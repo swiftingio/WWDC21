@@ -1,5 +1,5 @@
 //
-//  HomeViewModel.swift
+//  ApodViewModel.swift
 //  WWDC21
 //
 //  Created by mazurkk3 on 17/02/2022.
@@ -9,7 +9,7 @@ import APODY
 import Foundation
 import UIKit
 
-@MainActor class HomeViewModel: ObservableObject {
+@MainActor class ApodViewModel: ObservableObject {
     @Published var thumbnails: [String: UIImage] = [:]
 
     let networking: ApodNetworking
@@ -17,12 +17,13 @@ import UIKit
     let dataSource: ContinousApodPersistenceDataSource
     let imageCache = ImageCache()
 
-    private var currentModels: [APODModel] = []
+    private var currentModels: [ApodModel] = []
 
-    init(networking: ApodNetworking,
-         persistence: ApodPersistence,
-         dataSource: ContinousApodPersistenceDataSource)
-    {
+    init(
+        networking: ApodNetworking,
+        persistence: ApodPersistence,
+        dataSource: ContinousApodPersistenceDataSource
+    ) {
         self.persistence = persistence
         self.networking = networking
         self.dataSource = dataSource
@@ -58,6 +59,8 @@ import UIKit
         }
     }
 
+    // MARK: Helpers
+
     private func fetchThumbnails() async throws {
         try await withThrowingTaskGroup(of: (String, UIImage).self) { group in
             for model in currentModels.filter({ $0.media_type == .image }) {
@@ -84,8 +87,6 @@ import UIKit
             return image
         }
     }
-
-    // MARK: Helper
 
     private func cacheImage(image: UIImage, url: String) {
         Task.detached(priority: .background) { [weak self] in
