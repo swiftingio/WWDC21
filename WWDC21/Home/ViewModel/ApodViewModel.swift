@@ -78,7 +78,9 @@ import UIKit
 
     private func cacheImage(image: UIImage, url: String) {
         Task.detached(priority: .background) { [weak self] in
-            await self?.imageCache.insert(image: image, for: url)
+            if await self?.imageCache.getImage(for: url) == nil {
+                await self?.imageCache.insert(image: image, for: url)
+            }
         }
     }
 }
