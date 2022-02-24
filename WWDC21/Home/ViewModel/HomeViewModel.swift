@@ -19,7 +19,10 @@ import UIKit
 
     private var currentModels: [APODModel] = []
 
-    init(networking: ApodNetworking, persistence: ApodPersistence, dataSource: ContinousApodPersistenceDataSource) {
+    init(networking: ApodNetworking,
+         persistence: ApodPersistence,
+         dataSource: ContinousApodPersistenceDataSource)
+    {
         self.persistence = persistence
         self.networking = networking
         self.dataSource = dataSource
@@ -29,7 +32,9 @@ import UIKit
         }
     }
 
-    convenience init(persistence: ApodPersistence, dataSource: ContinousApodPersistenceDataSource) {
+    convenience init(persistence: ApodPersistence,
+                     dataSource: ContinousApodPersistenceDataSource)
+    {
         let defaultNetworking = DefaultApodNetworking()
         self.init(networking: defaultNetworking, persistence: persistence, dataSource: dataSource)
     }
@@ -56,7 +61,7 @@ import UIKit
     private func fetchThumbnails() async throws {
         try await withThrowingTaskGroup(of: (String, UIImage).self) { group in
             for model in currentModels.filter({ $0.media_type == .image }) {
-                group.addTask {
+                group.addTask(priority: .background) {
                     (model.url, try await self.fetchImage(url: model.url))
                 }
             }

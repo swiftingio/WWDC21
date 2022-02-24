@@ -13,8 +13,10 @@ struct ApodView: View {
     let model: APODModel
     let image: UIImage?
     let persistence: ApodPersistence
+
     @Binding var showDetails: Bool
-    @EnvironmentObject var presentedObject: PresentedView
+    @Binding var presentedModel: APODModel?
+    @Binding var presentedImage: UIImage?
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -34,26 +36,31 @@ struct ApodView: View {
 
     @ViewBuilder
     func makeImageView() -> some View {
-        Group {
-            if let image = image {
-                Image(uiImage: image)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-            } else {
-                ProgressView()
-            }
-        }
-        .onTapGesture {
-            withAnimation {
-                if model.media_type == .image {
-                    presentedObject.image = image
-                    presentedObject.model = model
-                    showDetails.toggle()
+        if presentedImage != image && !showDetails {
+            Group {
+                if let image = image {
+                    Image(uiImage: image)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                } else {
+                    ProgressView()
                 }
             }
+            .onTapGesture {
+                withAnimation {
+                    if model.media_type == .image {
+                        presentedImage = image
+                        presentedModel = model
+                        showDetails.toggle()
+                    }
+                }
+            }
+            .matchedGeometryEffect(id: "mainImage\(model.title)", in: namespace)
+            .frame(minWidth: 0, minHeight: 400)
+        } else {
+            ProgressView()
+                .frame(minWidth: 0, minHeight: 400)
         }
-        .matchedGeometryEffect(id: "mainImage\(model.title)", in: namespace)
-        .frame(minWidth: 0, minHeight: 400)
 
         makeTitleView()
     }
@@ -90,7 +97,9 @@ struct ApodView_Previews: PreviewProvider {
                  model: model!,
                  image: nil,
                  persistence: DefaultApodStorage(container: APODYPersistenceController.preview.container),
-                 showDetails: .constant(false))
+                 showDetails: .constant(false),
+                 presentedModel: .constant(nil),
+                 presentedImage: .constant(nil))
             .environment(\.managedObjectContext, APODYPersistenceController.preview.container.viewContext)
     }
 }

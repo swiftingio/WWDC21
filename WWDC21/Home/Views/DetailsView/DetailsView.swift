@@ -12,6 +12,8 @@ import SwiftUI
 struct DetailsView: View {
     let model: APODModel
     @Binding var showDetails: Bool
+    @Binding var presentedImage: UIImage?
+
     var image: UIImage?
 
     var namespace: Namespace.ID
@@ -29,6 +31,7 @@ struct DetailsView: View {
             }
             Button {
                 withAnimation {
+                    presentedImage = nil
                     showDetails.toggle()
                 }
             } label: {

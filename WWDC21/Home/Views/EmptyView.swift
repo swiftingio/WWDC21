@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct EmptyView: View {
+struct FavoritesEmptyView: View {
     var body: some View {
         VStack(alignment: .center, spacing: 10) {
             Image(systemName: "star")
