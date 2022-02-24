@@ -11,21 +11,20 @@ import SwiftUI
 struct ApodView: View {
     var namespace: Namespace.ID
     let model: APODModel
-    @StateObject var viewModel: ApodViewModel
-    @Binding var showDetails: Bool
-    @EnvironmentObject var presentedObject: PresentedView
+    let image: UIImage?
+    let persistence: ApodPersistence
 
-    var isPresentedView: Bool {
-        showDetails && presentedObject.model?.url == viewModel.url
-    }
+    @Binding var showDetails: Bool
+    @Binding var presentedModel: APODModel?
+    @Binding var presentedImage: UIImage?
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            switch viewModel.type {
+            switch model.media_type {
             case .image:
                 makeImageView()
             case .video:
-                VideoWebView(request: URLRequest(url: URL(string: viewModel.url)!))
+                VideoWebView(request: URLRequest(url: URL(string: model.url)!))
                     .frame(maxWidth: .infinity, minHeight: 400)
                 makeTitleView()
             }
@@ -33,33 +32,35 @@ struct ApodView: View {
         .background(.thickMaterial)
         .mask(RoundedRectangle(cornerRadius: 16))
         .padding(.bottom, 8)
-        .task {
-            try? await viewModel.getApodContent()
-        }
     }
 
     @ViewBuilder
     func makeImageView() -> some View {
-        Group {
-            if let image = viewModel.image {
-                Image(uiImage: image)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-            } else {
-                ProgressView()
-            }
-        }
-        .onTapGesture {
-            withAnimation {
-                if viewModel.type == .image {
-                    presentedObject.image = viewModel.image
-                    presentedObject.model = model
-                    showDetails.toggle()
+        if presentedImage != image && !showDetails {
+            Group {
+                if let image = image {
+                    Image(uiImage: image)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                } else {
+                    ProgressView()
                 }
             }
+            .onTapGesture {
+                withAnimation {
+                    if model.media_type == .image {
+                        presentedImage = image
+                        presentedModel = model
+                        showDetails.toggle()
+                    }
+                }
+            }
+            .matchedGeometryEffect(id: "mainImage\(model.title)", in: namespace)
+            .frame(minWidth: 0, minHeight: 400)
+        } else {
+            ProgressView()
+                .frame(minWidth: 0, minHeight: 400)
         }
-        .matchedGeometryEffect(id: "mainImage\(viewModel.title)", in: namespace)
-        .frame(minWidth: 0, minHeight: 400)
 
         makeTitleView()
     }
@@ -67,23 +68,17 @@ struct ApodView: View {
     @ViewBuilder
     func makeTitleView() -> some View {
         HStack {
-            Text(viewModel.title)
-                .matchedGeometryEffect(id: "mainTitle\(viewModel.title)", in: namespace)
+            Text(model.title)
+                .matchedGeometryEffect(id: "mainTitle\(model.title)", in: namespace)
             Spacer()
-            if model.favorite {
-                Button {
-                    Task {
-                        try? await viewModel.toggleFavorite()
-                    }
-                } label: {
-                    Image(systemName: "star.fill")
+            Button {
+                Task {
+                    try? await persistence.toggleFavorite(apod: model)
                 }
-            } else {
-                Button {
-                    Task {
-                        try? await viewModel.toggleFavorite()
-                    }
-                } label: {
+            } label: {
+                if model.favorite {
+                    Image(systemName: "star.fill")
+                } else {
                     Image(systemName: "star")
                 }
             }
@@ -100,10 +95,11 @@ struct ApodView_Previews: PreviewProvider {
         let model = try? ApodyFixtures.example1().randomElement()
         ApodView(namespace: namespace,
                  model: model!,
-                 viewModel: ApodViewModel(apod: model!,
-                                          networking: DefaultApodNetworking(),
-                                          imageCache: ImageCache(),
-                                          persistence: DefaultApodStorage(container: APODYPersistenceController.preview.container)), showDetails: .constant(false))
+                 image: nil,
+                 persistence: DefaultApodStorage(container: APODYPersistenceController.preview.container),
+                 showDetails: .constant(false),
+                 presentedModel: .constant(nil),
+                 presentedImage: .constant(nil))
             .environment(\.managedObjectContext, APODYPersistenceController.preview.container.viewContext)
     }
 }

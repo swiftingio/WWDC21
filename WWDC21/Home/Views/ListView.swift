@@ -18,10 +18,11 @@ class PresentedView: ObservableObject {
 struct ListView: View {
     @ObservedObject var viewModel: HomeViewModel
     @Environment(\.managedObjectContext) private var viewContext
-    @EnvironmentObject var presentedObject: PresentedView
 
     @Namespace var namespace
     @State private var showDetails: Bool = false
+    @State private var presentedModel: APODModel?
+    @State private var presentedImage: UIImage?
 
     @SectionedFetchRequest(
         sectionIdentifier: ApodSort.default.section,
@@ -52,10 +53,11 @@ struct ListView: View {
                                     ApodView(
                                         namespace: namespace,
                                         model: model,
-                                        viewModel: ApodViewModel(apod: model,
-                                                                 networking: viewModel.networking,
-                                                                 imageCache: viewModel.imageCache, persistence: viewModel.persistence),
-                                        showDetails: $showDetails
+                                        image: viewModel.thumbnails[model.url],
+                                        persistence: viewModel.persistence,
+                                        showDetails: $showDetails,
+                                        presentedModel: $presentedModel,
+                                        presentedImage: $presentedImage
                                     )
                                     .listRowBackground(Color.clear)
                                     .listRowSeparator(.hidden)
@@ -97,13 +99,12 @@ struct ListView: View {
             }
             .colorScheme(.dark)
 
-            if showDetails, let apod = presentedObject.model {
+            if showDetails, let apod = presentedModel {
                 DetailsView(
-                    viewModel: ApodViewModel(apod: apod,
-                                             networking: viewModel.networking,
-                                             imageCache: viewModel.imageCache, persistence: viewModel.persistence),
+                    model: apod,
                     showDetails: $showDetails,
-                    image: presentedObject.image,
+                    presentedImage: $presentedImage,
+                    image: presentedImage,
                     namespace: namespace
                 )
             }

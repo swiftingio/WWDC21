@@ -13,10 +13,11 @@ import SwiftUI
 
 struct FavoritesView: View {
     @ObservedObject var viewModel: HomeViewModel
-    @EnvironmentObject var presentedObject: PresentedView
 
     @Namespace var favoritesNamespace
     @State private var showDetails: Bool = false
+    @State private var presentedModel: APODModel?
+    @State private var presentedImage: UIImage?
 
     @FetchRequest(
         entity: Apod.entity(),
@@ -31,37 +32,38 @@ struct FavoritesView: View {
             NavigationView {
                 ZStack {
                     if apods.isEmpty {
-                        EmptyView()
+                        FavoritesEmptyView()
                     } else {
                         List {
                             ForEach(apods) { apod in
                                 let model = APODModel(coreDataApod: apod)
+
                                 ApodView(
                                     namespace: favoritesNamespace,
                                     model: model,
-                                    viewModel: ApodViewModel(apod: model,
-                                                             networking: viewModel.networking,
-                                                             imageCache: viewModel.imageCache, persistence: viewModel.persistence),
-                                    showDetails: $showDetails
+                                    image: viewModel.thumbnails[model.url],
+                                    persistence: viewModel.persistence,
+                                    showDetails: $showDetails,
+                                    presentedModel: $presentedModel,
+                                    presentedImage: $presentedImage
                                 )
                                 .listRowBackground(Color.clear)
                                 .listRowSeparator(.hidden)
                             }
-
                             .navigationTitle("Favorites")
                             .listStyle(.plain)
                         }
                     }
                 }
+                .animation(.default)
             }
 
-            if showDetails, let apod = presentedObject.model {
+            if showDetails, let apod = presentedModel {
                 DetailsView(
-                    viewModel: ApodViewModel(apod: apod,
-                                             networking: viewModel.networking,
-                                             imageCache: viewModel.imageCache, persistence: viewModel.persistence),
+                    model: apod,
                     showDetails: $showDetails,
-                    image: presentedObject.image,
+                    presentedImage: $presentedImage,
+                    image: presentedImage,
                     namespace: favoritesNamespace
                 )
             }

@@ -9,19 +9,20 @@ import APODY
 import Foundation
 import UIKit
 
-enum ViewModelError: Error {
-    case deinitialized
-}
-
 @MainActor class HomeViewModel: ObservableObject {
-    @Published var objects: [ApodViewModel] = []
+    @Published var thumbnails: [String: UIImage] = [:]
 
     let networking: ApodNetworking
     let persistence: ApodPersistence
     let dataSource: ContinousApodPersistenceDataSource
     let imageCache = ImageCache()
 
-    init(networking: ApodNetworking, persistence: ApodPersistence, dataSource: ContinousApodPersistenceDataSource) {
+    private var currentModels: [APODModel] = []
+
+    init(networking: ApodNetworking,
+         persistence: ApodPersistence,
+         dataSource: ContinousApodPersistenceDataSource)
+    {
         self.persistence = persistence
         self.networking = networking
         self.dataSource = dataSource
@@ -31,7 +32,9 @@ enum ViewModelError: Error {
         }
     }
 
-    convenience init(persistence: ApodPersistence, dataSource: ContinousApodPersistenceDataSource) {
+    convenience init(persistence: ApodPersistence,
+                     dataSource: ContinousApodPersistenceDataSource)
+    {
         let defaultNetworking = DefaultApodNetworking()
         self.init(networking: defaultNetworking, persistence: persistence, dataSource: dataSource)
     }
@@ -45,12 +48,50 @@ enum ViewModelError: Error {
     }
 
     public func setupDataSource() async {
-        guard let objects = dataSource.objects else {
-            fatalError("Async stream have to be initialized prior")
+        for await newObjects in dataSource.getObjects() {
+            currentModels = newObjects
+            do {
+                try await fetchThumbnails()
+            } catch {
+                print("error: \(error)")
+            }
         }
+    }
 
-        for await newObjects in objects {
-            self.objects = newObjects.map { ApodViewModel(apod: $0, networking: networking, imageCache: imageCache, persistence: persistence) }
+    private func fetchThumbnails() async throws {
+        try await withThrowingTaskGroup(of: (String, UIImage).self) { group in
+            for model in currentModels.filter({ $0.media_type == .image }) {
+                group.addTask(priority: .background) {
+                    (model.url, try await self.fetchImage(url: model.url))
+                }
+            }
+            for try await (url, image) in group {
+                self.append(image: image, url: url)
+            }
+        }
+    }
+
+    private func append(image: UIImage, url: String) {
+        thumbnails[url] = image
+    }
+
+    private func fetchImage(url: String) async throws -> UIImage {
+        if let cachedImage = await imageCache.getImage(for: url) {
+            return cachedImage
+        } else {
+            let image = try await networking.fetchImage(url: url)
+            cacheImage(image: image, url: url)
+            return image
+        }
+    }
+
+    // MARK: Helper
+
+    private func cacheImage(image: UIImage, url: String) {
+        Task.detached(priority: .background) { [weak self] in
+            if await self?.imageCache.getImage(for: url) == nil {
+                await self?.imageCache.insert(image: image, for: url)
+            }
         }
     }
 }

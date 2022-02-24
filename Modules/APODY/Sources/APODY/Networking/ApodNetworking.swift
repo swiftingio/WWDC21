@@ -52,7 +52,6 @@ public class DefaultApodNetworking: ApodNetworking {
         }
 
         let parsedData = try decoder.decode([APODModel].self, from: data)
-
         return parsedData
     }
 
@@ -91,6 +90,4 @@ public class DefaultApodNetworking: ApodNetworking {
         }
         return image
     }
-
-    // Helper
 }

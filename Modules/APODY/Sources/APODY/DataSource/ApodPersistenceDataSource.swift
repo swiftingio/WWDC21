@@ -13,32 +13,33 @@ import Foundation
 public typealias ApodDataSubject = CurrentValueSubject<[APODModel], Never>
 
 public protocol ContinousApodPersistenceDataSource {
-    var objects: AsyncStream<[APODModel]>? { get }
+    func getObjects() -> AsyncStream<[APODModel]>
 }
 
-public enum ApodDataSourceError: Error {
-    case objectWasReleased
-}
-
-public class DefaultApodPersistenceDataSource: NSObject, NSFetchedResultsControllerDelegate, ContinousApodPersistenceDataSource {
-    public var objects: AsyncStream<[APODModel]>?
-
+public class DefaultApodPersistenceDataSource: NSObject, ContinousApodPersistenceDataSource {
+    private var newDataAppeared: (([APODModel]) -> Void)?
     private let context: NSManagedObjectContext
     private var fetchedResultController: NSFetchedResultsController<Apod>?
-    private var continuation: AsyncStream<[APODModel]>.Continuation?
 
     public init(context: NSManagedObjectContext) {
         self.context = context
 
         super.init()
-        objects = AsyncStream([APODModel].self) { [weak self] continuation in
-            self?.continuation = continuation
-        }
         setupSubscription()
     }
 
-    public func controllerDidChangeContent(_: NSFetchedResultsController<NSFetchRequestResult>) {
-        continuation!.yield(currentData)
+    public func getObjects() -> AsyncStream<[APODModel]> {
+        return AsyncStream<[APODModel]> { [weak self] continuation in
+            guard let self = self else {
+                continuation.finish()
+                return
+            }
+            continuation.yield(self.currentData)
+
+            self.newDataAppeared = { newData in
+                continuation.yield(newData)
+            }
+        }
     }
 
     private var currentData: [APODModel] {
@@ -65,9 +66,14 @@ public class DefaultApodPersistenceDataSource: NSObject, NSFetchedResultsControl
 
         do {
             try fetchController.performFetch()
-            continuation!.yield(currentData)
         } catch {
             fatalError("\(error.localizedDescription)")
         }
+    }
+}
+
+extension DefaultApodPersistenceDataSource: NSFetchedResultsControllerDelegate {
+    public func controllerDidChangeContent(_: NSFetchedResultsController<NSFetchRequestResult>) {
+        newDataAppeared?(currentData)
     }
 }

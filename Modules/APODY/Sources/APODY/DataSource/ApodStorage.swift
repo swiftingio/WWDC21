@@ -24,7 +24,7 @@ public class DefaultApodStorage: ApodPersistence {
     public func save(apods: [APODModel]) async throws {
         let context = container.newBackgroundContext()
         context.automaticallyMergesChangesFromParent = true
-        context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+        context.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy
         try await context.perform {
             apods.forEach { apod in
                 _ = Apod(model: apod, context: context)
@@ -45,7 +45,7 @@ public class DefaultApodStorage: ApodPersistence {
     public func toggleFavorite(apod: APODModel) async throws {
         let context = container.newBackgroundContext()
         context.automaticallyMergesChangesFromParent = true
-        context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+        context.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy
         try await context.perform {
             let request: NSFetchRequest<Apod> = Apod.fetchRequest()
             request.fetchLimit = 1

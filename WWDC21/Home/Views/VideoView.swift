@@ -5,6 +5,7 @@
 //  Created by mazurkk3 on 18/02/2022.
 //
 
+import AVFoundation
 import Foundation
 import SwiftUI
 import WebKit
@@ -13,12 +14,12 @@ struct VideoWebView: UIViewRepresentable {
     let request: URLRequest
 
     func makeUIView(context _: Context) -> WKWebView {
-        return WKWebView()
+        let webView = WKWebView()
+        webView.load(request)
+        return webView
     }
 
-    func updateUIView(_ uiView: WKWebView, context _: Context) {
-        uiView.load(request)
-    }
+    func updateUIView(_: WKWebView, context _: Context) {}
 }
 
 #if DEBUG
