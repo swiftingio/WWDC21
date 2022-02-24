@@ -27,7 +27,10 @@ struct DetailsView: View {
                     Text(model.title)
                         .matchedGeometryEffect(id: "mainTitle\(model.title)", in: namespace)
                     Text(model.explanation)
+                        .font(.body)
+                        .padding(.horizontal, 20)
                 }
+                .padding(.bottom, 100)
             }
             Button {
                 withAnimation {
@@ -44,7 +47,6 @@ struct DetailsView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
             .padding(30)
         }
-        .colorScheme(.dark)
         .ignoresSafeArea()
     }
 

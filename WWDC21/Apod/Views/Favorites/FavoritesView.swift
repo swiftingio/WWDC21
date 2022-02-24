@@ -20,7 +20,7 @@ struct FavoritesView: View {
     @FetchRequest(
         entity: Apod.entity(),
         sortDescriptors: [
-            NSSortDescriptor(keyPath: \Apod.date, ascending: true),
+            NSSortDescriptor(keyPath: \Apod.date, ascending: false),
         ],
         predicate: NSPredicate(format: "favorite == %@", NSNumber(value: true))
     ) var apods: FetchedResults<Apod>

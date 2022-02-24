@@ -18,6 +18,12 @@ struct ApodView: View {
     @Binding var presentedModel: ApodModel?
     @Binding var presentedImage: UIImage?
 
+    private var dateFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d, yyyy"
+        return formatter
+    }
+
     var body: some View {
         ZStack(alignment: .bottom) {
             switch model.media_type {
@@ -68,19 +74,21 @@ struct ApodView: View {
     @ViewBuilder
     func makeTitleView() -> some View {
         HStack {
-            Text(model.title)
-                .matchedGeometryEffect(id: "mainTitle\(model.title)", in: namespace)
+            VStack(alignment: .leading) {
+                Text(model.title)
+                    .matchedGeometryEffect(id: "mainTitle\(model.title)", in: namespace)
+                Text(dateFormatter.string(from: model.date))
+                    .font(.caption)
+            }
             Spacer()
             Button {
                 Task {
                     try? await persistence.toggleFavorite(apod: model)
                 }
             } label: {
-                if model.favorite {
-                    Image(systemName: "star.fill")
-                } else {
-                    Image(systemName: "star")
-                }
+                Image(systemName: model.favorite ? "star.fill" : "star")
+                    .font(.title)
+                    .foregroundColor(.yellow)
             }
         }
         .padding()

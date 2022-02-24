@@ -34,10 +34,8 @@ struct ApodyTabView: View {
         .colorScheme(.dark)
         .font(.headline)
         .onAppear {
-            if #available(iOS 15.0, *) {
-                let appearance = UITabBarAppearance()
-                UITabBar.appearance().scrollEdgeAppearance = appearance
-            }
+            let appearance = UITabBarAppearance()
+            UITabBar.appearance().scrollEdgeAppearance = appearance
         }
     }
 }

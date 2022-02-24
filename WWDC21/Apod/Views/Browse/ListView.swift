@@ -61,7 +61,6 @@ struct ListView: View {
                         .navigationTitle("APOD")
                         .listStyle(.plain)
                     }
-                    .id(UUID())
                     .searchable(text: searchQuery)
                     .toolbar {
                         makeToolbarGroup()
@@ -74,7 +73,6 @@ struct ListView: View {
                     try? await viewModel.refreshData()
                 }
             }
-            .colorScheme(.dark)
 
             if showDetails, let apod = presentedModel {
                 DetailsView(
