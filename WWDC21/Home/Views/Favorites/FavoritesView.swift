@@ -39,9 +39,8 @@ struct FavoritesView: View {
                                 ApodView(
                                     namespace: favoritesNamespace,
                                     model: model,
-                                    viewModel: ApodViewModel(apod: model,
-                                                             networking: viewModel.networking,
-                                                             imageCache: viewModel.imageCache, persistence: viewModel.persistence),
+                                    image: viewModel.thumbnails[model.url],
+                                    persistence: viewModel.persistence,
                                     showDetails: $showDetails
                                 )
                                 .listRowBackground(Color.clear)
@@ -57,9 +56,7 @@ struct FavoritesView: View {
 
             if showDetails, let apod = presentedObject.model {
                 DetailsView(
-                    viewModel: ApodViewModel(apod: apod,
-                                             networking: viewModel.networking,
-                                             imageCache: viewModel.imageCache, persistence: viewModel.persistence),
+                    model: apod,
                     showDetails: $showDetails,
                     image: presentedObject.image,
                     namespace: favoritesNamespace

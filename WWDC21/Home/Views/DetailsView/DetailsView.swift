@@ -5,11 +5,12 @@
 //  Created by mazurkk3 on 21/02/2022.
 //
 
+import APODY
 import Foundation
 import SwiftUI
 
 struct DetailsView: View {
-    @StateObject var viewModel: ApodViewModel
+    let model: APODModel
     @Binding var showDetails: Bool
     var image: UIImage?
 
@@ -21,9 +22,9 @@ struct DetailsView: View {
             ScrollView {
                 VStack {
                     makeImageView()
-                    Text(viewModel.title)
-                        .matchedGeometryEffect(id: "mainTitle\(viewModel.title)", in: namespace)
-                    Text(viewModel.description)
+                    Text(model.title)
+                        .matchedGeometryEffect(id: "mainTitle\(model.title)", in: namespace)
+                    Text(model.explanation)
                 }
             }
             Button {
@@ -42,9 +43,6 @@ struct DetailsView: View {
         }
         .colorScheme(.dark)
         .ignoresSafeArea()
-        .task {
-            try? await viewModel.getApodContent()
-        }
     }
 
     @ViewBuilder
@@ -59,7 +57,7 @@ struct DetailsView: View {
                 ProgressView()
             }
         }
-        .matchedGeometryEffect(id: "mainImage\(viewModel.title)", in: namespace)
+        .matchedGeometryEffect(id: "mainImage\(model.title)", in: namespace)
         .frame(maxWidth: .infinity, minHeight: 400, maxHeight: .infinity)
     }
 }

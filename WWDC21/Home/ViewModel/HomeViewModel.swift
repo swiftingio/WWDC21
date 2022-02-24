@@ -10,12 +10,14 @@ import Foundation
 import UIKit
 
 @MainActor class HomeViewModel: ObservableObject {
-    @Published var objects: [ApodViewModel] = []
+    @Published var thumbnails: [String: UIImage] = [:]
 
     let networking: ApodNetworking
     let persistence: ApodPersistence
     let dataSource: ContinousApodPersistenceDataSource
     let imageCache = ImageCache()
+
+    private var currentModels: [APODModel] = []
 
     init(networking: ApodNetworking, persistence: ApodPersistence, dataSource: ContinousApodPersistenceDataSource) {
         self.persistence = persistence
@@ -42,7 +44,49 @@ import UIKit
 
     public func setupDataSource() async {
         for await newObjects in dataSource.getObjects() {
-            objects = newObjects.map { ApodViewModel(apod: $0, networking: networking, imageCache: imageCache, persistence: persistence) }
+            currentModels = newObjects
+            do {
+                try await fetchThumbnails()
+            } catch {
+                print("error: \(error)")
+            }
+        }
+    }
+
+    private func fetchThumbnails() async throws {
+        try await withThrowingTaskGroup(of: (String, UIImage).self) { group in
+            for model in currentModels.filter({ $0.media_type == .image }) {
+                group.addTask {
+                    (model.url, try await self.fetchImage(url: model.url))
+                }
+            }
+            for try await (url, image) in group {
+                self.append(image: image, url: url)
+            }
+        }
+    }
+
+    private func append(image: UIImage, url: String) {
+        thumbnails[url] = image
+    }
+
+    public func fetchImage(url: String) async throws -> UIImage {
+        if let cachedImage = await imageCache.getImage(for: url) {
+            return cachedImage
+        } else {
+            let image = try await networking.fetchImage(url: url)
+            cacheImage(image: image, url: url)
+            return image
+        }
+    }
+
+    // MARK: Helper
+
+    private func cacheImage(image: UIImage, url: String) {
+        Task.detached(priority: .background) { [weak self] in
+            if await self?.imageCache.getImage(for: url) == nil {
+                await self?.imageCache.insert(image: image, for: url)
+            }
         }
     }
 }
