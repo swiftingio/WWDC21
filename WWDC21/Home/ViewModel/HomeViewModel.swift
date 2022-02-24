@@ -70,7 +70,7 @@ import UIKit
         thumbnails[url] = image
     }
 
-    public func fetchImage(url: String) async throws -> UIImage {
+    private func fetchImage(url: String) async throws -> UIImage {
         if let cachedImage = await imageCache.getImage(for: url) {
             return cachedImage
         } else {

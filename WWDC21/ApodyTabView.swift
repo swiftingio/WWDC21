@@ -24,6 +24,12 @@ struct ApodyTabView: View {
                     Image(systemName: "star")
                     Text("Favorites")
                 }
+
+            FormView()
+                .tabItem {
+                    Image(systemName: "note.text")
+                    Text("Feedback")
+                }
         }
         .colorScheme(.dark)
         .font(.headline)
