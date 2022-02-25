@@ -1,10 +1,3 @@
-//
-//  File.swift
-//
-//
-//  Created by mazurkk3 on 17/02/2022.
-//
-
 import Foundation
 
 public protocol URLParameter {

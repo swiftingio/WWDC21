@@ -1,10 +1,10 @@
 import Foundation
 
 public enum ApodyFixtures {
-    public static func example1() throws -> [APODModel] {
+    public static func example1() throws -> [ApodModel] {
         let jsonDecoder = JSONDecoderFactory.defaultApodJSONDecoder()
         let jsonData = try JSONDataProvider.loadJSONFile(filename: "SampleApody")
-        let result = try jsonDecoder.decode([APODModel].self, from: jsonData)
+        let result = try jsonDecoder.decode([ApodModel].self, from: jsonData)
         return result
     }
 }

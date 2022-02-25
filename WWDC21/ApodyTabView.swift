@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 struct ApodyTabView: View {
-    let viewModel: HomeViewModel
+    let viewModel: ApodViewModel
 
     var body: some View {
         TabView {
@@ -34,10 +34,8 @@ struct ApodyTabView: View {
         .colorScheme(.dark)
         .font(.headline)
         .onAppear {
-            if #available(iOS 15.0, *) {
-                let appearance = UITabBarAppearance()
-                UITabBar.appearance().scrollEdgeAppearance = appearance
-            }
+            let appearance = UITabBarAppearance()
+            UITabBar.appearance().scrollEdgeAppearance = appearance
         }
     }
 }

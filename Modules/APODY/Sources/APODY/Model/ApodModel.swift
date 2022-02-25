@@ -2,14 +2,14 @@ import APODYModel
 import CoreData
 import Foundation
 
-public enum APODMediaType: String, Codable {
-    case image
-    case video
-}
-
-public struct APODModel: Codable, Equatable, Identifiable, Hashable {
+public struct ApodModel: Codable, Equatable, Identifiable, Hashable {
     public var id: String {
         url
+    }
+
+    public enum MediaType: String, Codable {
+        case image
+        case video
     }
 
     enum CodingKeys: String, CodingKey {
@@ -26,7 +26,7 @@ public struct APODModel: Codable, Equatable, Identifiable, Hashable {
     public let date: Date
     public let explanation: String
     public let hdurl: String?
-    public let media_type: APODMediaType
+    public let media_type: MediaType
     public let service_version: String
     public let title: String
     public let url: String
@@ -38,7 +38,7 @@ public struct APODModel: Codable, Equatable, Identifiable, Hashable {
         date = try container.decode(Date.self, forKey: CodingKeys.date)
         explanation = try container.decode(String.self, forKey: CodingKeys.explanation)
         hdurl = try container.decodeIfPresent(String.self, forKey: CodingKeys.hdurl)
-        media_type = try container.decode(APODMediaType.self, forKey: CodingKeys.media_type)
+        media_type = try container.decode(MediaType.self, forKey: CodingKeys.media_type)
         service_version = try container.decode(String.self, forKey: CodingKeys.service_version)
         title = try container.decode(String.self, forKey: CodingKeys.title)
         url = try container.decode(String.self, forKey: CodingKeys.url)
@@ -49,7 +49,7 @@ public struct APODModel: Codable, Equatable, Identifiable, Hashable {
         date: Date,
         explanation: String,
         hdurl: String?,
-        media_type: APODMediaType,
+        media_type: MediaType,
         service_version: String,
         title: String,
         url: String,
@@ -66,12 +66,12 @@ public struct APODModel: Codable, Equatable, Identifiable, Hashable {
     }
 }
 
-public extension APODModel {
+public extension ApodModel {
     init(coreDataApod: APODYModel.Apod) {
         self.init(date: coreDataApod.date,
                   explanation: coreDataApod.explanation,
                   hdurl: coreDataApod.hdurl,
-                  media_type: APODMediaType(rawValue: coreDataApod.media_type) ?? .image,
+                  media_type: MediaType(rawValue: coreDataApod.media_type) ?? .image,
                   service_version: coreDataApod.service_version,
                   title: coreDataApod.title,
                   url: coreDataApod.url,
@@ -80,7 +80,7 @@ public extension APODModel {
 }
 
 extension APODYModel.Apod {
-    convenience init(model: APODModel, context: NSManagedObjectContext) {
+    convenience init(model: ApodModel, context: NSManagedObjectContext) {
         self.init(context: context)
         date = model.date
         explanation = model.explanation

@@ -10,13 +10,8 @@ import Foundation
 import SwiftUI
 
 struct DetailsView: View {
-    let model: APODModel
-    @Binding var showDetails: Bool
-    @Binding var presentedImage: UIImage?
-
-    var image: UIImage?
-
-    var namespace: Namespace.ID
+    let model: ApodModel
+    @Binding var image: UIImage?
 
     var body: some View {
         ZStack {
@@ -25,26 +20,13 @@ struct DetailsView: View {
                 VStack {
                     makeImageView()
                     Text(model.title)
-                        .matchedGeometryEffect(id: "mainTitle\(model.title)", in: namespace)
                     Text(model.explanation)
+                        .font(.body)
+                        .padding(.horizontal, 20)
                 }
+                .padding(.bottom, 100)
             }
-            Button {
-                withAnimation {
-                    presentedImage = nil
-                    showDetails.toggle()
-                }
-            } label: {
-                Image(systemName: "xmark")
-                    .font(.body.weight(.bold))
-                    .foregroundColor(.secondary)
-                    .padding(10)
-                    .background(.ultraThinMaterial, in: Circle())
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
-            .padding(30)
         }
-        .colorScheme(.dark)
         .ignoresSafeArea()
     }
 
@@ -60,7 +42,6 @@ struct DetailsView: View {
                 ProgressView()
             }
         }
-        .matchedGeometryEffect(id: "mainImage\(model.title)", in: namespace)
         .frame(maxWidth: .infinity, minHeight: 400, maxHeight: .infinity)
     }
 }

@@ -2,11 +2,9 @@ import APODYModel
 import CoreData
 import Foundation
 
-public protocol ApodPersistence {
-    var container: NSPersistentContainer { get set }
-
-    func save(apods: [APODModel]) async throws
-    func toggleFavorite(apod: APODModel) async throws
+public protocol ApodPersistence: Sendable {
+    func save(apods: [ApodModel]) async throws
+    func toggleFavorite(apod: ApodModel) async throws
     func purge() async throws
 }
 
@@ -14,17 +12,19 @@ enum StorageError: Error {
     case noElements
 }
 
-public class DefaultApodStorage: ApodPersistence {
+public actor DefaultApodStorage: ApodPersistence {
     public var container: NSPersistentContainer
 
     public init(container: NSPersistentContainer) {
         self.container = container
     }
 
-    public func save(apods: [APODModel]) async throws {
+    public func save(apods: [ApodModel]) async throws {
+        assert(!Thread.isMainThread)
         let context = container.newBackgroundContext()
         context.automaticallyMergesChangesFromParent = true
         context.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy
+
         try await context.perform {
             apods.forEach { apod in
                 _ = Apod(model: apod, context: context)
@@ -42,10 +42,12 @@ public class DefaultApodStorage: ApodPersistence {
         }
     }
 
-    public func toggleFavorite(apod: APODModel) async throws {
+    public func toggleFavorite(apod: ApodModel) async throws {
+        assert(!Thread.isMainThread)
         let context = container.newBackgroundContext()
         context.automaticallyMergesChangesFromParent = true
         context.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy
+
         try await context.perform {
             let request: NSFetchRequest<Apod> = Apod.fetchRequest()
             request.fetchLimit = 1
