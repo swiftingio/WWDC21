@@ -12,7 +12,6 @@ import Foundation
 import UIKit
 
 public actor ThumbnailDataSource {
-    public var thumbnails: [String: UIImage] = [:]
 
     private let imageCache: ImageCache
     private let networking: ApodNetworking

@@ -12,10 +12,6 @@ import SwiftUI
 @main
 struct WWDC21App: App {
     let persistenceController = APODYPersistenceController.shared
-    let context: NSManagedObjectContext = {
-        APODYPersistenceController.shared.container.viewContext
-    }()
-
     let networking = DefaultApodNetworking()
     let imageCache = ImageCache()
 
@@ -31,7 +27,7 @@ struct WWDC21App: App {
                     networking: networking
                 )
             ))
-            .environment(\.managedObjectContext, context)
+            .environment(\.managedObjectContext, APODYPersistenceController.shared.container.viewContext)
         }
     }
 }
