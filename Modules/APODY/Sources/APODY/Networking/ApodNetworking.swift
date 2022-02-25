@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-public protocol ApodNetworking {
+public protocol ApodNetworking: Sendable {
     func fetchApods(count: Int) async throws -> [ApodModel]
     func fetchApods(startDate: Date, endDate: Date) async throws -> [ApodModel]
 
@@ -22,7 +22,7 @@ enum ApodNetworkingError: Error {
     case unableToCreateImage
 }
 
-public class DefaultApodNetworking: ApodNetworking {
+public actor DefaultApodNetworking: ApodNetworking {
     let decoder: JSONDecoder
     let urlBuilder: URLBuilder
 
@@ -52,6 +52,7 @@ public class DefaultApodNetworking: ApodNetworking {
         }
 
         let parsedData = try decoder.decode([ApodModel].self, from: data)
+
         return parsedData
     }
 

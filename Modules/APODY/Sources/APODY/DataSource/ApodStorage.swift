@@ -2,9 +2,7 @@ import APODYModel
 import CoreData
 import Foundation
 
-public protocol ApodPersistence {
-    var container: NSPersistentContainer { get set }
-
+public protocol ApodPersistence: Sendable {
     func save(apods: [ApodModel]) async throws
     func toggleFavorite(apod: ApodModel) async throws
     func purge() async throws
@@ -14,7 +12,7 @@ enum StorageError: Error {
     case noElements
 }
 
-public class DefaultApodStorage: ApodPersistence {
+public actor DefaultApodStorage: ApodPersistence {
     public var container: NSPersistentContainer
 
     public init(container: NSPersistentContainer) {
@@ -22,6 +20,7 @@ public class DefaultApodStorage: ApodPersistence {
     }
 
     public func save(apods: [ApodModel]) async throws {
+        assert(!Thread.isMainThread)
         let context = container.newBackgroundContext()
         context.automaticallyMergesChangesFromParent = true
         context.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy
@@ -44,6 +43,7 @@ public class DefaultApodStorage: ApodPersistence {
     }
 
     public func toggleFavorite(apod: ApodModel) async throws {
+        assert(!Thread.isMainThread)
         let context = container.newBackgroundContext()
         context.automaticallyMergesChangesFromParent = true
         context.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy

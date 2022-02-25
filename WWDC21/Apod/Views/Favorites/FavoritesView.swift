@@ -12,7 +12,6 @@ import Foundation
 import SwiftUI
 
 struct FavoritesView: View {
-    @Namespace var favoritesNamespace
     @ObservedObject var viewModel: ApodViewModel
 
     // MARK: Core data properties
@@ -24,12 +23,6 @@ struct FavoritesView: View {
         ],
         predicate: NSPredicate(format: "favorite == %@", NSNumber(value: true))
     ) var apods: FetchedResults<Apod>
-
-    // MARK: Details View properties
-
-    @State private var showDetails: Bool = false
-    @State private var presentedModel: ApodModel?
-    @State private var presentedImage: UIImage?
 
     // MARK: Views
 
@@ -43,39 +36,27 @@ struct FavoritesView: View {
                         List {
                             ForEach(apods) { apod in
                                 let model = ApodModel(coreDataApod: apod)
-
-                                ApodView(
-                                    namespace: favoritesNamespace,
-                                    model: model,
-                                    image: viewModel.thumbnails[model.url],
-                                    persistence: viewModel.persistence,
-                                    showDetails: $showDetails,
-                                    presentedModel: $presentedModel,
-                                    presentedImage: $presentedImage
-                                )
-                                .listRowBackground(Color.clear)
-                                .listRowSeparator(.hidden)
+                                makeApodCell(model: model)
                             }
                             .navigationTitle("Favorites")
                             .listStyle(.plain)
                         }
+                        .buttonStyle(PlainButtonStyle())
                     }
                 }
                 .animation(.default)
-            }
-
-            if showDetails, let apod = presentedModel {
-                DetailsView(
-                    model: apod,
-                    showDetails: $showDetails,
-                    presentedImage: $presentedImage,
-                    image: presentedImage,
-                    namespace: favoritesNamespace
-                )
             }
         }
     }
 
     @ViewBuilder
-    private func makeApodCell() -> some View {}
+    private func makeApodCell(model: ApodModel) -> some View {
+        ApodView(
+            model: model,
+            image: $viewModel.thumbnails[model.url],
+            persistence: viewModel.persistence
+        )
+        .listRowBackground(Color.clear)
+        .listRowSeparator(.hidden)
+    }
 }

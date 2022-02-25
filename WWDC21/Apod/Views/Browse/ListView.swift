@@ -16,14 +16,13 @@ struct ListView: View {
     @Namespace var namespace
     @ObservedObject var viewModel: ApodViewModel
 
-    // MARK: Core data properties
+    @State private var selectedSort = ApodSort.default
 
     @SectionedFetchRequest(
         sectionIdentifier: ApodSort.default.section,
         sortDescriptors: ApodSort.default.descriptors
     )
     public var apods: SectionedFetchResults<String, Apod>
-    @State private var selectedSort = ApodSort.default
 
     // MARK: Search properties
 
@@ -37,65 +36,56 @@ struct ListView: View {
         }
     }
 
-    // MARK: Details view - related state
-
-    @State private var showDetails: Bool = false
-    @State private var presentedModel: ApodModel?
-    @State private var presentedImage: UIImage?
-
     // MARK: Views
 
     var body: some View {
         ZStack {
             NavigationView {
                 ZStack {
-                    List {
-                        ForEach(apods) { section in
-                            Section(header: Text(section.id)) {
-                                ForEach(section) { apod in
-                                    let model = ApodModel(coreDataApod: apod)
-                                    makeApodCell(model: model)
+                    if apods.isEmpty {
+                        EmptyView()
+                    } else {
+                        List {
+                            ForEach(apods) { section in
+                                Section(header: Text(section.id)) {
+                                    ForEach(section) { apod in
+                                        let model = ApodModel(coreDataApod: apod)
+                                        makeApodCell(model: model)
+                                    }
                                 }
                             }
+                            .navigationTitle("APOD")
+                            .listStyle(.plain)
                         }
-                        .navigationTitle("APOD")
-                        .listStyle(.plain)
-                    }
-                    .searchable(text: searchQuery)
-                    .toolbar {
-                        makeToolbarGroup()
+                        .buttonStyle(PlainButtonStyle())
+                        .toolbar {
+                            makeToolbarGroup()
+                        }
+                        .refreshable {
+                            try? await viewModel.refreshData()
+                        }
+                        .task {
+                            let sections = apods.flatMap { $0 }
+                            let result = sections.map { ApodModel(coreDataApod: $0) }
+                            await viewModel.fetchThumbnails(for: result)
+                        }
                     }
                 }
-                .refreshable {
-                    try? await viewModel.refreshData()
-                }
+                .searchable(text: searchQuery)
                 .task {
                     try? await viewModel.refreshData()
                 }
             }
-
-            if showDetails, let apod = presentedModel {
-                DetailsView(
-                    model: apod,
-                    showDetails: $showDetails,
-                    presentedImage: $presentedImage,
-                    image: presentedImage,
-                    namespace: namespace
-                )
-            }
+            .accentColor(.white)
         }
     }
 
     @ViewBuilder
     private func makeApodCell(model: ApodModel) -> some View {
         ApodView(
-            namespace: namespace,
             model: model,
-            image: viewModel.thumbnails[model.url],
-            persistence: viewModel.persistence,
-            showDetails: $showDetails,
-            presentedModel: $presentedModel,
-            presentedImage: $presentedImage
+            image: $viewModel.thumbnails[model.url],
+            persistence: viewModel.persistence
         )
         .listRowBackground(Color.clear)
         .listRowSeparator(.hidden)
@@ -114,12 +104,5 @@ struct ListView: View {
                 request.sectionIdentifier = selectedSort.section
             }
         }
-    }
-}
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ListView(viewModel: ApodViewModel(persistence: DefaultApodStorage(container: APODYPersistenceController.preview.container), dataSource: DefaultApodPersistenceDataSource(context: APODYPersistenceController.preview.container.newBackgroundContext())))
-            .environment(\.managedObjectContext, APODYPersistenceController.preview.container.viewContext)
     }
 }

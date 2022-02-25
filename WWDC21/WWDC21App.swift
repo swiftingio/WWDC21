@@ -16,14 +16,20 @@ struct WWDC21App: App {
         APODYPersistenceController.shared.container.viewContext
     }()
 
+    let networking = DefaultApodNetworking()
+    let imageCache = ImageCache()
+
     var body: some Scene {
         WindowGroup {
             ApodyTabView(viewModel: ApodViewModel(
+                networking: networking,
                 persistence: DefaultApodStorage(
                     container: persistenceController.container
                 ),
-                dataSource: DefaultApodPersistenceDataSource(
-                    context: persistenceController.container.newBackgroundContext())
+                dataSource: ThumbnailDataSource(
+                    imageCache: imageCache,
+                    networking: networking
+                )
             ))
             .environment(\.managedObjectContext, context)
         }
