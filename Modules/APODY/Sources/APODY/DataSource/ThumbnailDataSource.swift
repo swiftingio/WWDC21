@@ -12,7 +12,6 @@ import Foundation
 import UIKit
 
 public actor ThumbnailDataSource {
-
     private let imageCache: ImageCache
     private let networking: ApodNetworking
 
@@ -24,24 +23,30 @@ public actor ThumbnailDataSource {
         self.networking = networking
     }
 
-    public nonisolated func getThumbnails(models: [ApodModel]) -> AsyncStream<[String: UIImage]> {
-        return AsyncStream<[String: UIImage]> { [weak self] continuation in
-            guard let self = self else { return }
+    public typealias ThumbnailsStream = AsyncStream<(String, UIImage)>
+
+    public nonisolated func getThumbnails(models: [ApodModel]) -> ThumbnailsStream {
+        return ThumbnailsStream { continuation in
             Task {
-                try await withThrowingTaskGroup(of: (String, UIImage).self) { group in
-                    var thumbnails: [String: UIImage] = [:]
-                    for model in models.filter({ $0.media_type == .image }) {
-                        group.addTask(priority: .background) {
-                            (model.url, try await self.fetchImage(url: model.url))
-                        }
-                    }
-                    for try await (url, image) in group {
-                        thumbnails[url] = image
-                        continuation.yield(thumbnails)
-                    }
-                    continuation.finish()
+                try await fetchThumbnails(from: models, continuation: continuation)
+            }
+        }
+    }
+
+    private func fetchThumbnails(
+        from apody: [ApodModel],
+        continuation: ThumbnailsStream.Continuation
+    ) async throws {
+        try await withThrowingTaskGroup(of: (String, UIImage).self) { group in
+            for apod in apody.filter({ $0.media_type == .image }) {
+                group.addTask(priority: .background) {
+                    (apod.url, try await self.fetchImage(url: apod.url))
                 }
             }
+            for try await data in group {
+                continuation.yield(data)
+            }
+            continuation.finish()
         }
     }
 
