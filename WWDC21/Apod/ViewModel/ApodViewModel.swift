@@ -39,8 +39,8 @@ import UIKit
     }
 
     public func fetchThumbnails(for models: [ApodModel]) async {
-        for await thumbnails in dataSource.getThumbnails(models: models) {
-            self.thumbnails = thumbnails
+        for await (url, image) in dataSource.getThumbnails(models: models) {
+            thumbnails[url] = image
         }
     }
 }
