@@ -13,9 +13,9 @@ The application is based on the NASA API which allows for displaying the APOD (A
 
 ### Authors
 
-Bartłomiej Woronin,	contact: [email](mailto:bartlomiej.woronin@gmail.com), [Twitter](https://twitter.com/juniortjt1).
+Bartłomiej Woronin,	contact: [email](mailto:bartlomiej.woronin@gmail.com), [Twitter](https://twitter.com/BWoronin).
 
-Kacper Mazurkiewicz,	contact: [email](mailto:kacper.mazurk@gmail.com), [Twitter](https://twitter.com/BWoronin).
+Kacper Mazurkiewicz,	contact: [email](mailto:kacper.mazurk@gmail.com), [Twitter](https://twitter.com/juniortjt1).
 
 ### Project information
 
